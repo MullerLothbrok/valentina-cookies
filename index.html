@@ -28,84 +28,46 @@ header{height:70px;position:sticky;top:0;z-index:50;display:flex;align-items:cen
 footer{display:flex;justify-content:space-between;gap:20px;padding:27px clamp(14px,5vw,80px);background:var(--paper);font-weight:900;font-size:13px}footer a{text-decoration:underline;text-underline-offset:3px}
 .drawer{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:100;display:none}.drawer.open{display:block}.panel{position:absolute;right:0;top:0;height:100%;width:min(480px,100%);background:var(--paper);padding:24px;overflow:auto;border-left:var(--line)}.close{float:right;width:44px;height:44px;border-radius:50%;border:var(--line);background:#fff;font-size:24px;cursor:pointer}.drawer h2{font-family:"Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif;font-size:46px;margin:8px 0 20px;letter-spacing:-.05em}.cart-items{clear:both}.cart-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:var(--line);background:#fff;border-radius:17px;margin:8px 0}.cart-row b{display:block;margin-bottom:3px}.cart-row small{color:var(--muted)}.qty{display:flex;align-items:center;gap:7px}.qty button{width:29px;height:29px;border:1.5px solid var(--ink);border-radius:50%;background:var(--yellow);font-weight:1000;cursor:pointer}.summary{display:flex;justify-content:space-between;border-top:var(--line);margin-top:17px;padding-top:16px;font-size:20px;font-weight:1000}.drawer-note{font-size:12px;color:var(--muted);line-height:1.45}.full{width:100%;margin-top:10px}.wa{background:var(--ink);color:#fff}.empty{padding:25px 0;color:var(--muted)}.mobile-cart{display:none}
 @media(max-width:1050px){.category:nth-child(n){grid-column:span 6}.catalog-list{grid-template-columns:1fr}.photo-grid{grid-template-columns:1fr 1fr;grid-template-rows:390px 300px 300px}.shot:nth-child(1){grid-column:1/3;grid-row:auto}.shot:nth-child(4){grid-column:1/3}}
-@media(max-width:780px){.ticker{height:31px}.ticker-track{padding-top:7px}header{height:62px;padding:0 14px}.nav{display:none}.logo{font-size:24px}.cart-btn{margin-left:auto;padding:9px 12px}.hero{grid-template-columns:1fr;min-height:auto}.hero-copy{min-height:59svh;padding:45px 18px}.hero h1{font-size:clamp(58px,18vw,88px)}.hero-photo{min-height:64svh}.sticker{right:15px;top:15px;max-width:170px;font-size:12px}.smiley{width:72px;height:72px;font-size:39px}.statement{padding:45px 16px}.section,.catalog-inner{padding:62px 14px}.head,.editorial-head{display:block}.head p,.editorial-head p{margin-top:15px}.category-grid{display:grid;grid-template-columns:1fr}.category:nth-child(n){grid-column:auto;min-height:62svh}.item{grid-template-columns:72px 1fr auto;padding:10px}.item-photo{width:72px;height:72px}.item h3{font-size:16px}.item p{font-size:12px}.price{font-size:13px}.editorial{padding:58px 14px}.photo-grid{grid-template-columns:1fr;grid-template-rows:none}.shot,.shot:nth-child(1),.shot:nth-child(4){grid-column:auto;grid-row:auto;height:56svh}.brand{grid-template-columns:1fr;min-height:auto}.brand-copy{padding:60px 18px}.brand-visual{height:62svh}.feature{padding:60px 15px}.feature-grid{grid-template-columns:1fr}.feature-photo{height:64svh}.final{grid-template-columns:1fr}.final-copy{padding:62px 18px}.final-photo{min-height:62svh;border-left:0;border-top:var(--line)}footer{flex-direction:column;font-size:12px}.mobile-cart{display:flex;position:fixed;left:14px;right:14px;bottom:14px;z-index:45;border:var(--line);border-radius:999px;background:var(--ink);color:#fff;padding:13px 16px;justify-content:space-between;align-items:center;font-weight:950;box-shadow:5px 5px 0 var(--pink)}body{padding-bottom:74px}}
+@media(max-width:780px){.ticker{height:31px}.ticker-track{padding-top:7px}header{height:62px;padding:0 14px}.nav{display:none}.logo{font-size:24px}.cart-btn{margin-left:auto;padding:9px 12px}.hero{grid-template-columns:1fr;min-height:auto}.hero-copy{min-height:59svh;padding:45px 18px}.hero h1{font-size:clamp(58px,18vw,88px)}.hero-photo{min-height:64svh}.sticker{right:15px;top:15px;max-width:170px;font-size:12px}.smiley{width:72px;height:72px;font-size:39px}.statement{padding:45px 16px}.section,.catalog-inner{padding:62px 14px}.head,.editorial-head{display:block}.head p,.editorial-head p{margin-top:15px}.category-grid{display:grid;grid-template-columns:1fr}.category:nth-child(n){grid-column:auto;min-height:62svh}.item{grid-template-columns:72px 1fr auto;padding:10px}.item-photo{width:72px;height:72px}.item h3{font-size:16px}.item p{font-size:12px}.price{font-size:13px}.editorial{padding:58px 14px}.photo-grid{grid-template-columns:1fr;grid-template-rows:none}.shot,.shot:nth-child(1),.shot:nth-child(4){grid-column:auto;grid-row:auto;height:56svh}.brand{grid-template-columns:1fr;min-height:auto}.brand-copy{padding:60px 18px}.brand-visual{height:62svh}.feature{padding:60px 15px}.feature-grid{grid-template-columns:1fr}.feature-photo{height:64svh}.final{grid-template-columns:1fr}.final-copy{padding:62px 18px}.final-photo{min-height:62svh;border-left:0;border-top:var(--line)}footer{flex-direction:column;font-size:12px}.mobile-cart{display:flex;position:fixed;left:14px;right:14px;bottom:14px;z-index:45;border:var(--line);border-radius:18px;background:var(--ink);color:#fff;padding:13px 16px;justify-content:space-between;align-items:center;font-weight:950;box-shadow:5px 5px 0 var(--pink)}footer{padding-bottom:92px}}
 </style>
 </head>
 <body>
-<div class="ticker"><div class="ticker-track">COOKIES FACTORY ★ COOKIES RELLENAS ★ BOXES ★ POSTRES ★ REGALOS ★ PERSONALIZADAS ★ ENVÍOS A TODO PARAGUAY ★ MUCHO MOOD ★</div></div>
-<header>
-  <a class="logo" href="#inicio" aria-label="Valentina Cookies Factory"><span>Valen</span><span>tina</span></a>
-  <nav class="nav"><a href="#colecciones">Productos</a><a href="#catalogo">Catálogo</a><a href="#fotos">Fotos</a><a href="#pedidos">Pedidos</a></nav>
-  <button class="cart-btn" onclick="openCart()">Pedido · <span id="count">0</span></button>
-</header>
+<div class="ticker"><div class="ticker-track">VALENTINA COOKIES FACTORY ✦ ENCARNACIÓN ✦ COOKIES ESTILO AMERICANA ✦ BOXES ✦ REGALOS ✦ ENVÍOS A TODO PARAGUAY ✦ VALENTINA COOKIES FACTORY ✦ ENCARNACIÓN ✦ COOKIES ESTILO AMERICANA ✦ BOXES ✦ REGALOS ✦ ENVÍOS A TODO PARAGUAY ✦</div></div>
+<header><a href="#inicio" class="logo" aria-label="Valentina Cookies Factory"><span>Valen</span><span>tina</span></a><nav class="nav"><a href="#mundo">Mundo Valentina</a><a href="#catalogo">Catálogo</a><a href="#fotos">Fotos</a><a href="#pedidos">Pedidos</a></nav><button class="cart-btn" onclick="openCart()">Pedido <span id="count">0</span></button></header>
 <main>
-<section class="hero" id="inicio">
-  <div class="hero-copy">
-    <div class="eyebrow">VALENTINA · COOKIES FACTORY · ENCARNACIÓN</div>
-    <h1>Mucho cookie.<br><span class="hot">Mucho mood.</span></h1>
-    <p>Cookies, boxes, postres y regalos que entran por los ojos antes del primer mordisco.</p>
-    <div class="actions"><a class="btn dark" href="#catalogo">Ver catálogo</a><a class="btn" href="https://instagram.com/valentinacookiespy" target="_blank" rel="noopener">Instagram ↗</a></div>
-  </div>
-  <div class="hero-photo"><img src="pack:01" alt="Selección de productos de Valentina Cookies Factory" fetchpriority="high"><div class="sticker">HECHO PARA ANTOJARSE ✦</div><div class="smiley">☺</div></div>
-</section>
-<div class="statement">Grande, relleno, colorido y sin pedir disculpas. <b>Eso es Valentina.</b> <em>♥</em></div>
-
-<section class="section" id="colecciones">
-  <div class="head"><div><div class="eyebrow">NUESTRA MESA</div><h2 class="section-title">Todo tiene personalidad.</h2></div><p>No somos una galería de galletitas iguales. Hay cookies americanas, boxes, rolls, postres, piezas personalizadas y ediciones que cambian con la ocasión.</p></div>
-  <div class="category-grid">
-    <article class="category"><span class="pill">Cookies</span><img src="pack:02" alt="Cookie con sprinkles sobre fondo amarillo" loading="lazy"><div class="category-overlay"><h3>Cookies que se notan.</h3><p>Clásicas, cargadas, rellenas y con toppings.</p></div></article>
-    <article class="category"><span class="pill">Rolls</span><img src="pack:03" alt="Roll relleno con frutilla" loading="lazy"><div class="category-overlay"><h3>Rolls.</h3><p>Suaves, intensos y hechos para abrir al medio.</p></div></article>
-    <article class="category"><span class="pill">Regalos</span><img src="pack:04" alt="Caja de regalo colorida de Valentina" loading="lazy"><div class="category-overlay"><h3>Boxes con intención.</h3><p>Para cumpleaños, amistad, empresas o porque sí.</p></div></article>
-    <article class="category"><span class="pill">Cookie cup</span><img src="pack:05" alt="Vaso comestible de cookie con café" loading="lazy"><div class="category-overlay"><h3>Tomate la cookie.</h3><p>Un producto que también es parte de la experiencia.</p></div></article>
-    <article class="category"><span class="pill">Personalizadas</span><img src="pack:06" alt="Cookies decoradas personalizadas de Valentina" loading="lazy"><div class="category-overlay"><h3>Diseños a medida.</h3><p>Glasé, personajes, marcas y eventos.</p></div></article>
-    <article class="category"><span class="pill">Postres</span><img src="pack:07" alt="Postres Valentina en envases transparentes" loading="lazy"><div class="category-overlay"><h3>Más allá de la cookie.</h3><p>Brownies, potes, cookie pies y ediciones especiales.</p></div></article>
-  </div>
-</section>
-
-<section class="catalog" id="catalogo"><div class="catalog-inner">
-  <div class="head"><div><div class="eyebrow">CATÁLOGO</div><h2 class="section-title">Elegí tu antojo.</h2></div><p>Estos son los precios que tenemos confirmados del catálogo actual. Los pedidos personalizados y ediciones especiales se cotizan según diseño y cantidad.</p></div>
-  <div class="catalog-list">
-    <article class="item"><div class="item-photo"><img src="pack:08" alt="Cookie clásica con chips de chocolate" loading="lazy"></div><div><h3>Galleta individual</h3><p>Galleta con diseño / unidad.</p></div><div class="item-side"><div class="price">Gs. 9.000</div><button class="add" aria-label="Agregar galleta individual" onclick="addItem('Galleta individual',9000)">+</button></div></article>
-    <article class="item"><div class="item-photo"><img src="pack:09" alt="Torre de cookies rellenas" loading="lazy"></div><div><h3>3 cookies rellenas</h3><p>Cajita de 3 cookies rellenas.</p></div><div class="item-side"><div class="price">Gs. 45.000</div><button class="add" aria-label="Agregar 3 cookies rellenas" onclick="addItem('3 cookies rellenas',45000)">+</button></div></article>
-    <article class="item"><div class="item-photo"><img src="pack:10" alt="Caja regalo de Valentina" loading="lazy"></div><div><h3>Cajita de la amistad</h3><p>Box especial para regalar.</p></div><div class="item-side"><div class="price">A consultar</div><button class="add" aria-label="Agregar cajita de la amistad" onclick="addItem('Cajita de la amistad',0)">+</button></div></article>
-    <article class="item"><div class="item-photo"><img src="pack:11" alt="Bucket con mini cookies surtidas" loading="lazy"></div><div><h3>Mini cookies para compartir</h3><p>8 mini cookies + salsita.</p></div><div class="item-side"><div class="price">Gs. 50.000</div><button class="add" aria-label="Agregar mini cookies" onclick="addItem('Mini cookies para compartir',50000)">+</button></div></article>
-    <article class="item"><div class="item-photo"><img src="pack:12" alt="Cookie rellena con centro de chocolate" loading="lazy"></div><div><h3>Cookie rellena</h3><p>Cookie rellena / unidad.</p></div><div class="item-side"><div class="price">Gs. 15.000</div><button class="add" aria-label="Agregar cookie rellena" onclick="addItem('Cookie rellena',15000)">+</button></div></article>
-    <article class="item"><div class="item-photo"><img src="pack:13" alt="Producto decorado de edición especial" loading="lazy"></div><div><h3>Paleta de glasé</h3><p>Diseño coordinado con el cliente.</p></div><div class="item-side"><div class="price">Gs. 10.000</div><button class="add" aria-label="Agregar paleta de glasé" onclick="addItem('Paleta de glasé',10000)">+</button></div></article>
-    <article class="item"><div class="item-photo"><img src="pack:14" alt="Selección surtida de productos" loading="lazy"></div><div><h3>Cookies & alfajor</h3><p>Cajita combinada.</p></div><div class="item-side"><div class="price">Gs. 30.000</div><button class="add" aria-label="Agregar cookies y alfajor" onclick="addItem('Cookies & alfajor',30000)">+</button></div></article>
-    <article class="item"><div class="item-photo"><img src="pack:15" alt="Caja especial de edición regalo" loading="lazy"></div><div><h3>Pedidos especiales</h3><p>Boxes, postres, eventos y cantidades especiales.</p></div><div class="item-side"><div class="price">A consultar</div><button class="add" aria-label="Agregar pedido especial" onclick="addItem('Pedido especial',0)">+</button></div></article>
-  </div>
-  <p class="note">Precios sujetos a actualización. La confirmación final del pedido se realiza por WhatsApp.</p>
+<section class="hero" id="inicio"><div class="hero-copy"><div class="eyebrow">ENCARNACIÓN · PARAGUAY</div><h1>MUCHO <span class="hot">COOKIE.</span><br>MUCHO MOOD.</h1><p>Cookies estilo americana, boxes, regalos y postres hechos para verse tan bien como saben.</p><div class="actions"><a class="btn dark" href="#catalogo">Ver catálogo ↓</a><a class="btn" href="https://wa.me/595994793372?text=Hola%20Valentina%20%F0%9F%8D%AA%20Quiero%20hacer%20un%20pedido." target="_blank" rel="noopener">Pedir por WhatsApp ↗</a></div></div><div class="hero-photo"><img src="DSC_8474.jpg" alt="Selección de productos de Valentina Cookies Factory" fetchpriority="high"><div class="sticker">HECHO PARA ANTOJARSE ✦</div><div class="smiley">☺</div></div></section>
+<section class="statement">No hacemos postres para pasar desapercibidos.<br><b>Cookies que se notan.</b> <em>Regalos que se recuerdan.</em></section>
+<section class="section" id="mundo"><div class="head"><div><div class="eyebrow">EL MUNDO VALENTINA</div><h2 class="section-title">Una marca.<br>Muchos antojos.</h2></div><p>No es sólo una tienda de cookies. Es un universo de sabores, colores, cajas, regalos y productos que van cambiando con la temporada.</p></div><div class="category-grid">
+<article class="category"><span class="pill">Cookies</span><img src="DSC_6225.jpg" alt="Cookie con sprinkles sobre fondo amarillo" loading="lazy"><div class="category-overlay"><h3>Cookies que se notan.</h3><p>Clásicas, cargadas, rellenas y con toppings.</p></div></article>
+<article class="category"><span class="pill">Rolls</span><img src="DSC_8383.jpg" alt="Roll relleno con frutilla" loading="lazy"><div class="category-overlay"><h3>Rolls.</h3><p>Suaves, intensos y hechos para abrir al medio.</p></div></article>
+<article class="category"><span class="pill">Regalos</span><img src="DSC_6221.jpg" alt="Caja de regalo colorida de Valentina" loading="lazy"><div class="category-overlay"><h3>Boxes con intención.</h3><p>Para cumpleaños, amistad, empresas o porque sí.</p></div></article>
+<article class="category"><span class="pill">Cookie cup</span><img src="DSC_1224.jpg" alt="Vaso comestible de cookie con café" loading="lazy"><div class="category-overlay"><h3>Tomate la cookie.</h3><p>Un producto que también es parte de la experiencia.</p></div></article>
+<article class="category"><span class="pill">Personalizadas</span><img src="DSC_6233.jpg" alt="Cookies decoradas personalizadas de Valentina" loading="lazy"><div class="category-overlay"><h3>Diseños a medida.</h3><p>Glasé, personajes, marcas y eventos.</p></div></article>
+<article class="category"><span class="pill">Postres</span><img src="DSC_8315.jpg" alt="Postres Valentina en envases transparentes" loading="lazy"><div class="category-overlay"><h3>Más allá de la cookie.</h3><p>Brownies, potes, cookie pies y ediciones especiales.</p></div></article>
 </div></section>
-
-<section class="editorial" id="fotos">
-  <div class="editorial-head"><div><div class="eyebrow">FOOD PORN, PERO CON MARCA</div><h2 class="section-title">Miralo de cerca.</h2></div><p>Rellenos, texturas, chocolate y color. Las fotos son parte de la identidad de Valentina, no un relleno de la página.</p></div>
-  <div class="photo-grid">
-    <figure class="shot"><img src="pack:16" alt="Caramelo cayendo sobre una torre de cookies" loading="lazy"><figcaption class="shot-label">DRIP MODE</figcaption></figure>
-    <figure class="shot"><img src="pack:17" alt="Sándwiches dulces rojos con relleno cremoso" loading="lazy"><figcaption class="shot-label">COLOR + TEXTURA</figcaption></figure>
-    <figure class="shot"><img src="pack:18" alt="Cucharada de postre Valentina" loading="lazy"><figcaption class="shot-label">SOFT CENTER</figcaption></figure>
-    <figure class="shot"><img src="pack:19" alt="Selección de cookies de distintos sabores" loading="lazy"><figcaption class="shot-label">STACK IT</figcaption></figure>
-    <figure class="shot"><img src="pack:20" alt="Roll dulce artesanal de Valentina" loading="lazy"><figcaption class="shot-label">ROLL LOVE</figcaption></figure>
-    <figure class="shot"><img src="pack:21" alt="Detalle de postre Valentina" loading="lazy"><figcaption class="shot-label">BREAK IT</figcaption></figure>
-  </div>
-</section>
-
-<section class="brand">
-  <div class="brand-copy"><div class="eyebrow">VALENTINA, SIN DISFRAZARSE</div><h2 class="brand-title">Dulce, pop y un poco exagerado.</h2><p>Amarillo, negro, cajas que se reconocen a metros y productos que no necesitan parecer “delicados” para verse premium. La personalidad está en el producto, el packaging y en cada foto.</p><div class="brand-tags"><span class="brand-tag">Hecho en Encarnación</span><span class="brand-tag">Envíos a todo Paraguay</span><span class="brand-tag">Pedidos personalizados</span></div></div>
-  <div class="brand-visual"><img src="pack:22" alt="Packaging colorido de Valentina Cookies Factory" loading="lazy"></div>
-</section>
-
-<section class="feature" id="pedidos"><div class="feature-grid">
-  <div class="feature-copy"><div class="eyebrow">REGALOS & OCASIONES</div><h2 class="section-title">Hacelo regalo. O quedátelo.</h2><p>Para fechas especiales, cumpleaños, empresas o una caja que simplemente diga “pensé en vos”. Contanos la idea y Valentina arma la propuesta.</p><div class="actions"><button class="btn" onclick="openCart()">Armar pedido</button><a class="btn" href="https://wa.me/595994793372?text=Hola%20Valentina%2C%20quiero%20consultar%20por%20un%20pedido%20personalizado." target="_blank" rel="noopener">Consultar por WhatsApp ↗</a></div></div>
-  <div class="feature-photo"><img src="pack:19" alt="Caja especial de regalo Valentina" loading="lazy"></div>
+<section class="catalog" id="catalogo"><div class="catalog-inner"><div class="head"><div><div class="eyebrow">CATÁLOGO BASE</div><h2 class="section-title">Elegí.<br>Sumá. Pedí.</h2></div><p>Armá tu selección. Al finalizar, enviamos todo junto por WhatsApp para confirmar disponibilidad, personalización y entrega.</p></div><div class="catalog-list">
+<article class="item"><div class="item-photo"><img src="DSC_1232.jpg" alt="Cookie clásica con chips de chocolate" loading="lazy"></div><div><h3>Galleta individual</h3><p>Galleta con diseño / unidad.</p></div><div class="item-side"><div class="price">Gs. 9.000</div><button class="add" aria-label="Agregar galleta individual" onclick="addItem('Galleta individual',9000)">+</button></div></article>
+<article class="item"><div class="item-photo"><img src="DSC_1269.jpg" alt="Torre de cookies rellenas" loading="lazy"></div><div><h3>3 cookies rellenas</h3><p>Cajita de 3 cookies rellenas.</p></div><div class="item-side"><div class="price">Gs. 45.000</div><button class="add" aria-label="Agregar 3 cookies rellenas" onclick="addItem('3 cookies rellenas',45000)">+</button></div></article>
+<article class="item"><div class="item-photo"><img src="DSC_6218.jpg" alt="Caja regalo de Valentina" loading="lazy"></div><div><h3>Cajita de la amistad</h3><p>Box especial para regalar.</p></div><div class="item-side"><div class="price">A consultar</div><button class="add" aria-label="Agregar cajita de la amistad" onclick="addItem('Cajita de la amistad',0)">+</button></div></article>
+<article class="item"><div class="item-photo"><img src="DSC_1283.jpg" alt="Bucket con mini cookies surtidas" loading="lazy"></div><div><h3>Mini cookies para compartir</h3><p>8 mini cookies + salsita.</p></div><div class="item-side"><div class="price">Gs. 50.000</div><button class="add" aria-label="Agregar mini cookies" onclick="addItem('Mini cookies para compartir',50000)">+</button></div></article>
+<article class="item"><div class="item-photo"><img src="DSC_6227.jpg" alt="Cookie rellena con centro de chocolate" loading="lazy"></div><div><h3>Cookie rellena</h3><p>Cookie rellena / unidad.</p></div><div class="item-side"><div class="price">Gs. 15.000</div><button class="add" aria-label="Agregar cookie rellena" onclick="addItem('Cookie rellena',15000)">+</button></div></article>
+<article class="item"><div class="item-photo"><img src="DSC_6232.jpg" alt="Producto decorado de edición especial" loading="lazy"></div><div><h3>Paleta de glasé</h3><p>Diseño coordinado con el cliente.</p></div><div class="item-side"><div class="price">Gs. 10.000</div><button class="add" aria-label="Agregar paleta de glasé" onclick="addItem('Paleta de glasé',10000)">+</button></div></article>
+<article class="item"><div class="item-photo"><img src="DSC_6234.jpg" alt="Selección surtida de productos" loading="lazy"></div><div><h3>Cookies & alfajor</h3><p>Cajita combinada.</p></div><div class="item-side"><div class="price">Gs. 30.000</div><button class="add" aria-label="Agregar cookies y alfajor" onclick="addItem('Cookies & alfajor',30000)">+</button></div></article>
+<article class="item"><div class="item-photo"><img src="DSC_6251.jpg" alt="Caja especial de edición regalo" loading="lazy"></div><div><h3>Pedidos especiales</h3><p>Boxes, postres, eventos y cantidades especiales.</p></div><div class="item-side"><div class="price">A consultar</div><button class="add" aria-label="Agregar pedido especial" onclick="addItem('Pedido especial',0)">+</button></div></article>
+</div><p class="note">Precios sujetos a actualización. La confirmación final del pedido se realiza por WhatsApp.</p></div></section>
+<section class="editorial" id="fotos"><div class="editorial-head"><div><div class="eyebrow">FOOD PORN, PERO CON MARCA</div><h2 class="section-title">Miralo de cerca.</h2></div><p>Rellenos, texturas, chocolate y color. Las fotos son parte de la identidad de Valentina, no un relleno de la página.</p></div><div class="photo-grid">
+<figure class="shot"><img src="DSC_8474.jpg" alt="Caramelo cayendo sobre una torre de cookies" loading="lazy"><figcaption class="shot-label">DRIP MODE</figcaption></figure>
+<figure class="shot"><img src="DSC_8350.jpg" alt="Sándwiches dulces rojos con relleno cremoso" loading="lazy"><figcaption class="shot-label">COLOR + TEXTURA</figcaption></figure>
+<figure class="shot"><img src="DSC_8334.jpg" alt="Cucharada de postre Valentina" loading="lazy"><figcaption class="shot-label">SOFT CENTER</figcaption></figure>
+<figure class="shot"><img src="DSC_8439.jpg" alt="Selección de cookies de distintos sabores" loading="lazy"><figcaption class="shot-label">STACK IT</figcaption></figure>
+<figure class="shot"><img src="DSC_8265.jpg" alt="Roll dulce artesanal de Valentina" loading="lazy"><figcaption class="shot-label">ROLL LOVE</figcaption></figure>
+<figure class="shot"><img src="DSC_8287.jpg" alt="Detalle de postre Valentina" loading="lazy"><figcaption class="shot-label">BREAK IT</figcaption></figure>
 </div></section>
-
-<section class="final">
-  <div class="final-copy"><div class="eyebrow">ENCARNACIÓN · PARAGUAY</div><h2 class="final-title">Tu próximo antojo empieza acá.</h2><p>Pedidos por WhatsApp · novedades y lanzamientos en Instagram · envíos a todo el país.</p><div class="actions"><a class="btn dark" href="https://wa.me/595994793372?text=Hola%20Valentina%20%F0%9F%8D%AA%20Quiero%20hacer%20un%20pedido." target="_blank" rel="noopener">WhatsApp</a><a class="btn" href="https://instagram.com/valentinacookiespy" target="_blank" rel="noopener">@valentinacookiespy</a></div></div>
-  <div class="final-photo"><img src="pack:04" alt="Selección de productos Valentina" loading="lazy"></div>
-</section>
+<section class="brand"><div class="brand-copy"><div class="eyebrow">VALENTINA, SIN DISFRAZARSE</div><h2 class="brand-title">Dulce, pop y un poco exagerado.</h2><p>Amarillo, negro, cajas que se reconocen a metros y productos que no necesitan parecer “delicados” para verse premium. La personalidad está en el producto, el packaging y en cada foto.</p><div class="brand-tags"><span class="brand-tag">Hecho en Encarnación</span><span class="brand-tag">Envíos a todo Paraguay</span><span class="brand-tag">Pedidos personalizados</span></div></div><div class="brand-visual"><img src="DSC_8435.jpg" alt="Packaging colorido de Valentina Cookies Factory" loading="lazy"></div></section>
+<section class="feature" id="pedidos"><div class="feature-grid"><div class="feature-copy"><div class="eyebrow">REGALOS & OCASIONES</div><h2 class="section-title">Hacelo regalo. O quedátelo.</h2><p>Para fechas especiales, cumpleaños, empresas o una caja que simplemente diga “pensé en vos”. Contanos la idea y Valentina arma la propuesta.</p><div class="actions"><button class="btn" onclick="openCart()">Armar pedido</button><a class="btn" href="https://wa.me/595994793372?text=Hola%20Valentina%2C%20quiero%20consultar%20por%20un%20pedido%20personalizado." target="_blank" rel="noopener">Consultar por WhatsApp ↗</a></div></div><div class="feature-photo"><img src="DSC_6218.jpg" alt="Caja especial de regalo Valentina" loading="lazy"></div></div></section>
+<section class="final"><div class="final-copy"><div class="eyebrow">ENCARNACIÓN · PARAGUAY</div><h2 class="final-title">Tu próximo antojo empieza acá.</h2><p>Pedidos por WhatsApp · novedades y lanzamientos en Instagram · envíos a todo el país.</p><div class="actions"><a class="btn dark" href="https://wa.me/595994793372?text=Hola%20Valentina%20%F0%9F%8D%AA%20Quiero%20hacer%20un%20pedido." target="_blank" rel="noopener">WhatsApp</a><a class="btn" href="https://instagram.com/valentinacookiespy" target="_blank" rel="noopener">@valentinacookiespy</a></div></div><div class="final-photo"><img src="DSC_8439.jpg" alt="Selección de productos Valentina" loading="lazy"></div></section>
 </main>
 <footer><span>© 2026 VALENTINA COOKIES FACTORY</span><span>ENCARNACIÓN · PARAGUAY</span><a href="https://instagram.com/valentinacookiespy" target="_blank" rel="noopener">INSTAGRAM ↗</a></footer>
-
 <div class="drawer" id="drawer" onclick="backdropClose(event)"><aside class="panel"><button class="close" onclick="closeCart()" aria-label="Cerrar">×</button><div class="eyebrow">TU PEDIDO</div><h2>Antojos elegidos.</h2><div class="cart-items" id="cartItems"></div><div class="summary"><span>Total conocido</span><span id="total">Gs. 0</span></div><p class="drawer-note">Los productos “a consultar” no se incluyen en el total. Valentina confirma disponibilidad, precio final y envío por WhatsApp.</p><button class="btn full wa" onclick="sendWhatsApp()">Abrir pedido en WhatsApp</button><button class="btn full" onclick="clearCart()">Vaciar pedido</button></aside></div>
 <button class="mobile-cart" onclick="openCart()"><span>Ver pedido</span><span><b id="mobileCount">0</b> · <span id="mobileTotal">Gs. 0</span></span></button>
 <script>
@@ -123,29 +85,6 @@ function closeCart(){document.getElementById('drawer').classList.remove('open');
 function backdropClose(e){if(e.target.id==='drawer')closeCart()}
 function sendWhatsApp(){const vals=Object.values(cart);let text='Hola Valentina 🍪\n\n';if(vals.length){text+='Quiero consultar/pedir:\n';vals.forEach(i=>text+=`• ${i.qty} × ${i.name}${i.price?` — Gs. ${money(i.price*i.qty)}`:' — a consultar'}\n`);if(getTotal())text+=`\nTotal conocido: Gs. ${money(getTotal())}\n`;text+='\n¿Me confirmás disponibilidad, precio final y envío?';}else{text+='Quiero hacer un pedido. ¿Me pasás las opciones disponibles?';}window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`,'_blank')}
 renderCart();
-</script>
-
-<script id="photo-pack-loader">
-(async()=>{
-  const lengths=[24152,24840,26662,27772,27706,29122,27814,22450,24702,28910,25452,25182,27590,24002,26256,25240,27102,26316,27808,28058,25972,25260];
-  try {
-    const r=await fetch('/photos.bin',{cache:'force-cache'});
-    if(!r.ok) throw new Error('photos '+r.status);
-    const buf=await r.arrayBuffer();
-    let off=0;
-    const urls=[];
-    for(const len of lengths){
-      urls.push(URL.createObjectURL(new Blob([buf.slice(off,off+len)],{type:'image/webp'})));
-      off+=len;
-    }
-    document.querySelectorAll('img[src^="pack:"]').forEach(img=>{
-      const n=parseInt(img.getAttribute('src').slice(5),10);
-      if(n>=1 && n<=urls.length) img.src=urls[n-1];
-    });
-  } catch(e) {
-    console.error('No se pudieron cargar las fotos',e);
-  }
-})();
 </script>
 </body>
 </html>
