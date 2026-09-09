@@ -2,33 +2,15 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#ffd31a">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffd21a">
 <title>Valentina Cookies Factory</title>
-<meta name="description" content="Cookies, boxes y postres con personalidad. Valentina Cookies Factory · Encarnación, Paraguay.">
-<style>
-html,body{margin:0;min-height:100%;background:#ffd31a;color:#111;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}body{display:grid;place-items:center}.wrap{text-align:center;padding:28px}.logo{font-weight:1000;font-size:clamp(34px,8vw,72px);line-height:.82;letter-spacing:-.06em}.logo span{display:block}.msg{margin-top:22px;font-weight:800}.dot{display:inline-block;animation:b 1s infinite alternate}@keyframes b{to{transform:translateY(-6px)}}
-</style>
+<meta http-equiv="refresh" content="0;url=https://valentina-cookies-100nb3brp-muller-lothbrok.vercel.app/">
+<link rel="canonical" href="https://valentina-cookies-muller-lothbrok.vercel.app/">
+<style>html,body{margin:0;min-height:100%;background:#ffd21a;color:#111;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}body{display:grid;place-items:center}.wrap{text-align:center;padding:28px}.logo{font-weight:1000;font-size:clamp(42px,9vw,84px);line-height:.82;letter-spacing:-.06em}.logo span{display:block}.msg{margin-top:24px;font-weight:850}</style>
 </head>
 <body>
-<div class="wrap"><div class="logo"><span>Valen</span><span>tina</span></div><div class="msg">Cargando la web <span class="dot">●</span></div></div>
-<script>
-(async()=>{
-  const base='https://raw.githubusercontent.com/MullerLothbrok/glam-joyas/valentina-definitiva-assets/deploy/valentina/';
-  try{
-    const parts=await Promise.all(Array.from({length:9},(_,i)=>fetch(base+`c${i}.txt`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.text()})));
-    const b64=parts.join('').replace(/\s+/g,'');
-    const bin=atob(b64);
-    const bytes=new Uint8Array(bin.length);
-    for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
-    const ds=new DecompressionStream('gzip');
-    const html=await new Response(new Blob([bytes]).stream().pipeThrough(ds)).text();
-    document.open();document.write(html);document.close();
-  }catch(e){
-    document.querySelector('.msg').innerHTML='No se pudo cargar. <button onclick="location.reload()" style="border:2px solid #111;border-radius:999px;padding:9px 14px;background:#fff;font-weight:900;cursor:pointer">Reintentar</button>';
-    console.error(e);
-  }
-})();
-</script>
+<div class="wrap"><div class="logo"><span>Valen</span><span>tina</span></div><div class="msg">Abriendo Valentina Cookies Factory…</div></div>
+<script>location.replace('https://valentina-cookies-100nb3brp-muller-lothbrok.vercel.app/'+location.search+location.hash)</script>
 </body>
 </html>
