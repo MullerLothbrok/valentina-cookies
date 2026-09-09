@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "https://valentina-cookies-pbsz2am6n-muller-lothbrok.vercel.app/$1"
+      "destination": "https://valentina-cookies-100nb3brp-muller-lothbrok.vercel.app/$1"
     }
   ]
 }
