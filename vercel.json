@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "https://valentina-cookies-pbsz2am6n-muller-lothbrok.vercel.app/$1"
+    }
+  ]
+}
