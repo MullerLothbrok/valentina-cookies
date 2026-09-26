@@ -1,0 +1,6 @@
+{
+  "name": "valentina-cookies",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test tests/order.test.js" }
+}
