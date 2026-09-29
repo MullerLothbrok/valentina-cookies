@@ -40,7 +40,7 @@ header{height:70px;position:sticky;top:0;z-index:50;display:flex;align-items:cen
 .hero-proof{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
 .hero-proof span{background:rgba(255,255,255,.48);border:1.8px solid var(--ink);border-radius:999px;padding:8px 11px;font-size:12px;font-weight:900}
 .actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:28px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 19px;border:var(--line);border-radius:999px;background:#fff;font-weight:950;box-shadow:4px 4px 0 var(--ink);transition:.15s transform,.15s box-shadow;cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 19px;border:var(--line);border-radius:999px;background:#fff;color:var(--ink);font-weight:950;box-shadow:4px 4px 0 var(--ink);transition:.15s transform,.15s box-shadow;cursor:pointer}
 .btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
 .btn.dark{background:var(--ink);color:#fff}
 .btn.pink{background:var(--pink)}
