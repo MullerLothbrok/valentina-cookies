@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Administrar tienda · Valentina</title>
+<link rel="stylesheet" href="/admin/panel.css"></head>
+<body><header><a href="/" class="brand">Valentina</a><a href="/">Ver tienda ↗</a></header>
+<main><h1>Administrar tienda</h1><p id="notice" class="notice" role="status" hidden></p>
+<form id="login" class="card login" hidden><label>Clave del panel<input name="password" type="password" autocomplete="current-password" required></label><button>Ingresar</button></form>
+<section id="dashboard" hidden><nav aria-label="Gestión"><button id="productsTab" aria-pressed="true">Productos</button><button id="ordersTab" aria-pressed="false">Pedidos nacionales</button><button id="logout" class="secondary">Salir</button></nav>
+<section id="products"><div class="heading"><h2>Productos</h2><button id="add">Agregar producto</button></div><div id="productList" class="list"></div></section>
+<section id="orders" hidden><div class="heading"><h2>Pedidos nacionales</h2><button class="secondary" id="refresh">Actualizar</button></div>
+<label class="filter">Estado<select id="filter"><option value="">Todos</option><option value="pendiente">Pendientes</option><option value="confirmado">Confirmados</option><option value="enviado">Enviados</option><option value="cancelado">Cancelados</option></select></label><div id="orderList" class="list"></div></section>
+</section></main>
+<dialog id="editor"><form id="edit"><div class="heading"><h2 id="editTitle">Editar producto</h2><button type="button" class="secondary" id="close">Cerrar</button></div>
+<label>Nombre<input name="title" maxlength="100" required></label>
+<label>Descripción<textarea name="description" rows="3" maxlength="600"></textarea></label>
+<div class="pair"><label>Precio en guaraníes<input type="number" name="price" min="0" max="999999999" step="1" required><small>0 para cotizar por WhatsApp.</small></label>
+<label>Unidades disponibles<input type="number" name="stock" min="0" max="999999" step="1"><small>Dejá vacío para vender por encargo.</small></label></div>
+<label class="check"><input type="checkbox" name="available">Disponible para pedidos</label>
+<label>Fotos<input id="files" type="file" multiple accept="image/*"><small>Hasta 6 fotos. La primera aparece en el catálogo.</small></label><div id="photos"></div>
+<p id="editError" role="alert"></p><div class="heading"><button id="save">Guardar producto</button><button id="delete" type="button" class="danger">Eliminar producto</button></div>
+</form></dialog><script type="module" src="/admin/panel.js"></script></body></html>

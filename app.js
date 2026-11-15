@@ -1,22 +1,57 @@
-import { CATALOG, emptyOrder, restoreOrder, totals, money, builderError, builderLines, buildMessage } from './order.js';
+import { emptyOrder, restoreOrder, totals, money, builderError, builderLines } from './order.js';
+import { request } from './shop-client.js';
+import { drawCatalog } from './catalog.js';
 
 const STORAGE = 'valentina-order-v1';
 const $ = id => document.getElementById(id);
-let order;
-try { order = restoreOrder(localStorage.getItem(STORAGE)); } catch { order = emptyOrder(); }
+let order = emptyOrder();
+let catalog = {};
+let loaded = false;
+let checkout = null;
+try { checkout = JSON.parse(sessionStorage.getItem('valentina-checkout')); } catch {}
+function rememberCheckout(value) {
+  checkout = value;
+  try { sessionStorage.setItem('valentina-checkout', JSON.stringify(value)); } catch {}
+}
+function capacity(id) {
+  const product = catalog[id];
+  return product?.available ? Math.min(9999, product.stock ?? 9999) : 0;
+}
+async function loadCatalog() {
+  const notice = $('catalogNotice');
+  try {
+    const data = await request();
+    catalog = data.products;
+    if (!loaded) {
+      try { order = restoreOrder(localStorage.getItem(STORAGE), catalog); } catch {}
+    }
+    for (const id of Object.keys(order.cart)) {
+      if (!capacity(id)) delete order.cart[id];
+      else order.cart[id] = Math.min(capacity(id), order.cart[id]);
+    }
+    drawCatalog(catalog);
+    loaded = true; notice.hidden = true;
+    restoreForm(); render();
+  } catch {
+    loaded = false;
+    notice.hidden = false; notice.textContent = 'No pudimos cargar el catálogo. Actualizá la página o consultá por WhatsApp.';
+    document.querySelector('.catalog-list').replaceChildren();
+  }
+}
 let modal = null;
 let returnFocus = null;
 let inertElements = [];
 const form = $('builderForm');
 
 function persist() {
+  if (!loaded) return;
   try { localStorage.setItem(STORAGE, JSON.stringify(order)); } catch { /* Ordering also works without storage. */ }
 }
 function render() {
   const container = $('cartItems');
   container.replaceChildren();
   for (const [id, qty] of Object.entries(order.cart)) {
-    const product = CATALOG[id];
+    const product = catalog[id];
     const row = document.createElement('div'); row.className = 'cart-row';
     const description = document.createElement('div');
     const name = document.createElement('b'); name.textContent = product.name;
@@ -29,7 +64,7 @@ function render() {
       button.textContent = delta < 0 ? '−' : '+';
       button.setAttribute('aria-label', `${delta < 0 ? 'Quitar una unidad de' : 'Agregar una unidad de'} ${product.name}`);
       button.dataset.quantity = id; button.dataset.delta = delta;
-      if (delta === 1 && qty >= 9999) button.disabled = true;
+      if (delta === 1 && qty >= capacity(id)) button.disabled = true;
       controls.append(button);
       if (delta === -1) controls.append(quantity);
     }
@@ -40,7 +75,7 @@ function render() {
     message.textContent = order.builder.active ? 'Tu idea está lista para consultar. También podés agregar productos del catálogo.' : 'Todavía no agregaste nada. Elegí productos del catálogo o contanos tu idea.';
     container.append(message);
   }
-  const sum = totals(order);
+  const sum = totals(order, catalog);
   $('count').textContent = sum.count; $('mobileCount').textContent = sum.count;
   $('total').textContent = sum.total ? `Gs. ${money(sum.total)}` : sum.label;
   $('mobileTotal').textContent = sum.label;
@@ -105,14 +140,14 @@ document.addEventListener('click', event => {
   if (target.closest('#mainNav') && target.matches('a')) setMenu(false);
   if (target.hasAttribute('data-open-cart')) openDialog('drawer');
   if (target.hasAttribute('data-close-dialog')) closeDialog();
-  if (target.dataset.product && Object.hasOwn(CATALOG, target.dataset.product)) {
+  if (target.dataset.product && capacity(target.dataset.product) > 0) {
     const id = target.dataset.product;
-    order.cart[id] = Math.min(9999, (order.cart[id] || 0) + 1); render(); openDialog('drawer');
+    order.cart[id] = Math.min(capacity(id), (order.cart[id] || 0) + 1); render(); openDialog('drawer');
   }
   if (target.dataset.quantity) {
     const id = target.dataset.quantity; const delta = Number(target.dataset.delta);
     const next = order.cart[id] + delta;
-    if (next <= 0) delete order.cart[id]; else order.cart[id] = Math.min(9999, next);
+    if (next <= 0) delete order.cart[id]; else order.cart[id] = Math.min(capacity(id), next);
     render();
     // Re-rendering must not strand keyboard focus on the page behind the dialog.
     ($('cartItems').querySelector(`[data-quantity="${id}"][data-delta="${delta}"]`) || modal.querySelector('[data-close-dialog]')).focus();
@@ -134,11 +169,27 @@ form.addEventListener('change', readBuilder);
 form.addEventListener('submit', event => { event.preventDefault(); readBuilder(); if (form.reportValidity()) openDialog('drawer'); });
 $('editBuilder').addEventListener('click', editBuilder);
 $('clearBuilder').addEventListener('click', () => { order.builder = emptyOrder().builder; restoreForm(); render(); modal.querySelector('[data-close-dialog]').focus(); });
-$('clearOrder').addEventListener('click', () => { order = emptyOrder(); restoreForm(); $('orderError').hidden = true; render(); });
-$('sendOrder').addEventListener('click', () => {
+$('clearOrder').addEventListener('click', () => { rememberCheckout(null); order = emptyOrder(); restoreForm(); $('orderError').hidden = true; render(); });
+$('sendOrder').addEventListener('click', async () => {
   const error = builderError(order.builder);
   if (error) { $('orderError').textContent = error; $('orderError').hidden = false; $('editBuilder').focus(); return; }
-  window.open(`https://wa.me/595994793372?text=${encodeURIComponent(buildMessage(order))}`, '_blank', 'noopener,noreferrer');
+  const button = $('sendOrder');
+  if (!Object.keys(order.cart).length && !order.builder.active) {
+    location.assign('https://wa.me/595994793372'); return;
+  }
+  if (!$('customerName').reportValidity() || !$('deliveryCity').reportValidity()) return;
+  const prices = Object.fromEntries(Object.keys(order.cart).map(id => [id, catalog[id].price]));
+  const payload = { order, prices, customer: $('customerName').value.trim(), city: $('deliveryCity').value.trim() };
+  const fingerprint = JSON.stringify(payload);
+  if (checkout?.fingerprint !== fingerprint) rememberCheckout({ fingerprint, key: crypto.randomUUID() });
+  button.disabled = true; $('orderError').hidden = true;
+  try {
+    const receipt = await request({ action: 'order', key: checkout.key, ...payload });
+    location.assign('https://wa.me/595994793372?text=' + encodeURIComponent(receipt.message));
+  } catch (e) {
+    if (e.status === 409) await loadCatalog();
+    $('orderError').hidden = false; $('orderError').textContent = e.message;
+  } finally { button.disabled = false; }
 });
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') {
@@ -153,4 +204,5 @@ document.addEventListener('keydown', event => {
   }
 });
 document.addEventListener('click', event => { if (!event.target.closest('header')) setMenu(false); });
-restoreForm(); render();
+document.querySelectorAll('[data-product]').forEach(el => { el.disabled = true; });
+await loadCatalog();

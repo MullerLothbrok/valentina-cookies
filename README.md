@@ -1,21 +1,7 @@
 # Valentina Cookies Factory
 
-Sitio web oficial de Valentina Cookies Factory.
+Sitio y panel de productos y pedidos de Valentina Cookies Factory. El catálogo público y el panel en `/admin/` usan las mismas funciones de Vercel y el mismo almacén privado de Vercel Blob.
 
-Static HTML, CSS and JavaScript; no build or runtime dependencies.
+Instalá las dependencias con `npm ci` y ejecutá `npm test`. Para probar la aplicación completa usá `vercel dev` con un almacén privado de desarrollo y una clave propia de ese entorno. En producción configurá el acceso a Blob desde el proyecto y `VALENTINA_ADMIN_PASSWORD` como secreto de al menos 16 caracteres.
 
-- `index.html`: content and responsive image references.
-- `styles.css`: desktop and mobile layout.
-- `app.js`: saved cart, box form, navigation and accessible dialogs.
-- `order.js`: catalog prices, state validation and WhatsApp message generation.
-- `assets/photos/`: optimized WebP sizes and social sharing image.
-- `assets/photo-map.json`: original source and image description mapping.
-- Owner-provided originals are kept in the local archive; optimized copies are published.
-
-Run `npm test` for order regression checks. Serve the repository with a static
-HTTP server for browser verification; ES modules require HTTP, not `file://`.
-
-Orders and box preferences are saved locally in the visitor's browser under
-`valentina-order-v1`. Nothing is sent until the visitor opens WhatsApp and
-chooses to send the message. Current prices always come from `order.js`.
-
+Los precios e imágenes de `order.js` inicializan el catálogo. Las ediciones posteriores se guardan en Blob. Stock vacío significa por encargo, y cero significa agotado. El cliente registra una solicitud pendiente con nombre y ciudad y abre WhatsApp con su referencia. Valentina confirma el pedido desde el panel, descuenta las unidades con stock y puede marcar el envío. Cancelar un pedido confirmado repone esas unidades. El pago se coordina por WhatsApp.

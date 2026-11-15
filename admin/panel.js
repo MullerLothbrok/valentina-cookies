@@ -1,0 +1,138 @@
+import { request, node } from '../shop-client.js';
+import { money } from '../order.js';
+
+const $ = id => document.getElementById(id);
+const edit = $('edit').elements;
+let data, draft;
+function note(message) {
+  $('notice').textContent = message; $('notice').hidden = !message;
+}
+function showLogin() {
+  data = null; $('dashboard').hidden = true; $('login').hidden = false;
+  $('productList').replaceChildren(); $('orderList').replaceChildren();
+}
+async function reload() {
+  try {
+    data = await request(null, '?view=admin');
+    $('login').hidden = true; $('dashboard').hidden = false;
+    renderProducts(); renderOrders();
+  } catch (error) {
+    if (error.status === 401) showLogin();
+    throw error;
+  }
+}
+function action(label, fn, style) {
+  const button = node('button', label, style);
+  button.type = 'button';
+  button.onclick = async () => {
+    button.disabled = true;
+    try { await fn(); } catch (e) { note(e.message); } finally { button.disabled = false; }
+  };
+  return button;
+}
+function renderProducts() {
+  const list = $('productList'); list.replaceChildren();
+  for (const [id, p] of Object.entries(data.products)) {
+    const row = node('article', null, 'row');
+    if (p.photos[0]) {
+      const image = node('img'); image.src = new URL(p.photos[0], location.origin); image.alt = ''; row.append(image);
+    }
+    const info = node('div', null, 'info');
+    const stock = !p.available || p.stock === 0 ? 'Agotado' : p.stock == null ? 'Por encargo' : p.stock + ' disponibles';
+    info.append(node('h3', p.name), node('p', (p.price ? 'Gs. ' + money(p.price) : 'A consultar') + ' · ' + stock, 'muted'));
+    row.append(info, action('Editar', () => openEditor(id), 'secondary')); list.append(row);
+  }
+  if (!list.children.length) list.append(node('p', 'Todavía no hay productos.'));
+}
+function renderOrders() {
+  const list = $('orderList'); list.replaceChildren();
+  for (const o of data.orders.filter(o => !$('filter').value || $('filter').value === o.status)) {
+    const card = node('article', null, 'card');
+    card.append(node('h3', o.customer + ' · ' + o.city), node('p', '#' + o.reference + ' · ' + o.status + ' · ' + new Date(o.created).toLocaleString('es-PY'), 'muted'));
+    const detail = node('details');
+    detail.append(node('summary', 'Detalle del pedido'), node('pre', o.message)); card.append(detail);
+    const controls = node('div', null, 'actions');
+    const next = o.status === 'pendiente' ? ['confirmado','cancelado'] : o.status === 'confirmado' ? ['enviado','cancelado'] : [];
+    const labels = { confirmado: 'Confirmar y descontar stock', cancelado: 'Cancelar pedido', enviado: 'Marcar enviado' };
+    for (const status of next) controls.append(action(labels[status], async () => {
+      if (status === 'cancelado' && !confirm('¿Cancelar el pedido #' + o.reference + '?')) return;
+      await request({ action:'status', id:o.id, status }); await reload(); note('Pedido actualizado.');
+    }, status === 'cancelado' ? 'secondary' : ''));
+    card.append(controls); list.append(card);
+  }
+  if (!list.children.length) list.append(node('p', 'No hay pedidos para mostrar.'));
+}
+function openEditor(id) {
+  const p = id ? data.products[id] : { name:'', description:'', price:0, stock:null, available:true, photos:[], version:null };
+  draft = { ...structuredClone(p), id:id || crypto.randomUUID() };
+  edit.title.value = p.name; edit.description.value = p.description; edit.price.value = p.price;
+  edit.stock.value = p.stock ?? ''; edit.available.checked = p.available; $('files').value = '';
+  $('editError').textContent = ''; $('editTitle').textContent = id ? 'Editar producto' : 'Agregar producto';
+  $('delete').hidden = !id; drawPhotos(); $('editor').showModal();
+}
+function drawPhotos() {
+  const area = $('photos'); area.replaceChildren();
+  draft.photos.forEach((photo, i) => {
+    const box = node('div'); const img = node('img');
+    img.src = photo.startsWith('data:') ? photo : new URL(photo, location.origin); img.alt = 'Foto ' + (i + 1);
+    box.append(img, action('Quitar', () => { draft.photos.splice(i, 1); drawPhotos(); }, 'secondary')); area.append(box);
+  });
+}
+async function resize(file) {
+  const img = new Image(); const url = URL.createObjectURL(file);
+  try {
+    img.src = url; await img.decode();
+    const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+    const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(img.naturalWidth * scale)); canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    const ctx = canvas.getContext('2d'); ctx.fillStyle = 'white'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/jpeg', .84);
+  } finally { URL.revokeObjectURL(url); }
+}
+$('files').onchange = async () => {
+  const files = [...$('files').files];
+  $('editError').textContent = '';
+  $('save').disabled = true;
+  try {
+    if (draft.photos.length + files.length > 6) throw Error('Elegí hasta seis fotos en total.');
+    const photos = [];
+    for (const file of files) photos.push(await resize(file));
+    draft.photos.push(...photos); drawPhotos();
+  } catch (e) { $('editError').textContent = e.message || 'No pudimos abrir esa foto.'; }
+  finally { $('files').value = ''; $('save').disabled = false; }
+};
+async function save(remove) {
+  $('save').disabled = true; $('delete').disabled = true; $('close').disabled = true; $('files').disabled = true;
+  try {
+    if (!remove) {
+      Object.assign(draft, { name:edit.title.value, description:edit.description.value, price:Number(edit.price.value),
+        stock:edit.stock.value === '' ? null : Number(edit.stock.value), available:edit.available.checked });
+      for (let i = 0; i < draft.photos.length; i++) {
+        const src = draft.photos[i];
+        if (src.startsWith('data:')) draft.photos[i] = (await request({action:'upload', image:src.split(',')[1]})).photo;
+      }
+    }
+    await request({ action:remove ? 'delete' : 'product', product:draft });
+    $('editor').close(); await reload(); note(remove ? 'Producto eliminado.' : 'Producto guardado.');
+  } catch (e) {
+    $('editError').textContent = e.message;
+    if (!$('editor').open) note(e.message);
+    if (e.status === 409) await reload().catch(err => note(err.message));
+  } finally { $('save').disabled = false; $('delete').disabled = false; $('close').disabled = false; $('files').disabled = false; }
+}
+$('edit').onsubmit = e => { e.preventDefault(); save(false); };
+$('delete').onclick = () => { if (confirm('¿Eliminar ' + draft.name + ' del catálogo?')) save(true); };
+$('add').onclick = () => openEditor(); $('close').onclick = () => $('editor').close();
+$('login').onsubmit = async e => {
+  e.preventDefault();
+  try { await request({action:'login',password:$('login').elements.password.value}); $('login').reset(); await reload(); note(''); }
+  catch (err) { note(err.message); }
+};
+$('logout').onclick = async () => { try { await request({action:'logout'}); showLogin(); note(''); } catch(e) { note(e.message); } };
+$('filter').onchange = renderOrders; $('refresh').onclick = () => reload().then(() => note('Lista actualizada.')).catch(e => note(e.message));
+function tab(orders) {
+  $('products').hidden = orders; $('orders').hidden = !orders;
+  $('productsTab').setAttribute('aria-pressed', String(!orders)); $('ordersTab').setAttribute('aria-pressed', String(orders));
+  if (orders) reload().catch(e => note(e.message));
+}
+$('ordersTab').onclick = () => tab(true); $('productsTab').onclick = () => tab(false);
+reload().catch(e => { showLogin(); if (e.status !== 401) note(e.message); });

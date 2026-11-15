@@ -1,1 +1,4 @@
 assets/originals/
+node_modules/
+.vercel/
+.env*

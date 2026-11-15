@@ -2,5 +2,13 @@
   "name": "valentina-cookies",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node --test tests/order.test.js" }
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.9.0"
+  },
+  "overrides": {
+    "zod": "4.6.6"
+  }
 }
