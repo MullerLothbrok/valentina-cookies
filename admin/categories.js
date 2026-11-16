@@ -2,7 +2,7 @@ import { request, node } from '../shop-client.js';
 import { money } from '../order.js';
 
 let categories = {};
-export function loadCategories(value, reload, note) {
+export function loadCategories(value, reload, note, addProduct) {
   categories = value;
   const list = document.getElementById('categoryList');
   list.replaceChildren();
@@ -33,6 +33,9 @@ export function loadCategories(value, reload, note) {
       }), note);
       const count = Object.values(categoryProducts).filter(p => p.categoryId === id && p.groupId === groupId).length;
       groupForm.append(node('small', count + ' productos usan este precio.'));
+      const add = node('button', 'Agregar presentación', 'secondary'); add.type = 'button';
+      add.onclick = () => addProduct({categoryId:id, groupId});
+      groupForm.append(add);
       card.append(groupForm);
     }
     const add = priceForm('', '', 'Agregar grupo de precio');

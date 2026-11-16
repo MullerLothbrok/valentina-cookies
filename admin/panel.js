@@ -21,7 +21,7 @@ async function reload() {
     data = await request(null, '?view=admin');
     $('login').hidden = true; $('dashboard').hidden = false;
     previewCatalog(data);
-    setCategoryProducts(data.products); loadCategories(data.categories, reload, note); renderProducts(); renderOrders(); loadPageEditor(data.page, data.originalSections);
+    setCategoryProducts(data.products); loadCategories(data.categories, reload, note, placement => { tab('products'); openEditor(undefined, false, placement); }); renderProducts(); renderOrders(); loadPageEditor(data.page, data.originalSections);
   } catch (error) {
     if (error.status === 401) showLogin();
     throw error;
@@ -77,8 +77,8 @@ function renderOrders() {
   }
   if (!list.children.length) list.append(node('p', 'No hay pedidos para mostrar.'));
 }
-function openEditor(id, duplicate = false) {
-  const p = id ? data.products[id] : { name:'', description:'', price:0, stock:null, available:true, photos:[], version:null };
+function openEditor(id, duplicate = false, placement = {}) {
+  const p = id ? data.products[id] : { name:'', description:'', price:0, stock:null, available:true, photos:[], version:null, ...placement };
   draft = { ...structuredClone(p), id:duplicate ? crypto.randomUUID() : id || crypto.randomUUID() };
   if (duplicate) { draft.version = null; draft.name = p.name + ' · nueva presentación'; }
   edit.title.value = draft.name; edit.description.value = p.description; edit.price.value = p.price;
