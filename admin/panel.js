@@ -1,5 +1,6 @@
 import { request, node } from '../shop-client.js';
 import { loadPageEditor, resetPageEditor } from './sections.js';
+import { loadCategories, selectCategory, setCategoryProducts } from './categories.js';
 import { money } from '../order.js';
 
 const $ = id => document.getElementById(id);
@@ -17,7 +18,7 @@ async function reload() {
   try {
     data = await request(null, '?view=admin');
     $('login').hidden = true; $('dashboard').hidden = false;
-    renderProducts(); renderOrders(); loadPageEditor(data.page, data.originalSections);
+    setCategoryProducts(data.products); loadCategories(data.categories, reload, note); renderProducts(); renderOrders(); loadPageEditor(data.page, data.originalSections);
   } catch (error) {
     if (error.status === 401) showLogin();
     throw error;
@@ -34,7 +35,14 @@ function action(label, fn, style) {
 }
 function renderProducts() {
   const list = $('productList'); list.replaceChildren();
+  const selected = $('productFilter').value;
+  $('productFilter').replaceChildren(new Option('Todas', ''), new Option('Sin categoría', 'none'));
+  for (const [id, c] of Object.entries(data.categories)) $('productFilter').add(new Option(c.name, id));
+  $('productFilter').value = selected;
+  const filter = $('productFilter').value;
+
   for (const [id, p] of Object.entries(data.products)) {
+    if (filter && (p.categoryId || 'none') !== filter) continue;
     const row = node('article', null, 'row');
     if (p.photos[0]) {
       const image = node('img'); image.src = new URL(p.photos[0], location.origin); image.alt = ''; row.append(image);
@@ -42,7 +50,9 @@ function renderProducts() {
     const info = node('div', null, 'info');
     const stock = !p.available || p.stock === 0 ? 'Agotado' : p.stock == null ? 'Por encargo' : p.stock + ' disponibles';
     info.append(node('h3', p.name), node('p', (p.price ? 'Gs. ' + money(p.price) : 'A consultar') + ' · ' + stock, 'muted'));
-    row.append(info, action('Editar', () => openEditor(id), 'secondary')); list.append(row);
+    const category = data.categories[p.categoryId];
+    if (category) info.append(node('small', category.name + (category.groups[p.groupId] ? ' · ' + category.groups[p.groupId].name : '')));
+    row.append(info, action('Editar', () => openEditor(id), 'secondary'), action('Duplicar', () => openEditor(id, true), 'secondary')); list.append(row);
   }
   if (!list.children.length) list.append(node('p', 'Todavía no hay productos.'));
 }
@@ -64,13 +74,15 @@ function renderOrders() {
   }
   if (!list.children.length) list.append(node('p', 'No hay pedidos para mostrar.'));
 }
-function openEditor(id) {
+function openEditor(id, duplicate = false) {
   const p = id ? data.products[id] : { name:'', description:'', price:0, stock:null, available:true, photos:[], version:null };
-  draft = { ...structuredClone(p), id:id || crypto.randomUUID() };
-  edit.title.value = p.name; edit.description.value = p.description; edit.price.value = p.price;
+  draft = { ...structuredClone(p), id:duplicate ? crypto.randomUUID() : id || crypto.randomUUID() };
+  if (duplicate) { draft.version = null; draft.name = p.name + ' · nueva presentación'; }
+  edit.title.value = draft.name; edit.description.value = p.description; edit.price.value = p.price;
   edit.stock.value = p.stock ?? ''; edit.available.checked = p.available; $('files').value = '';
-  $('editError').textContent = ''; $('editTitle').textContent = id ? 'Editar producto' : 'Agregar producto';
-  $('delete').hidden = !id; drawPhotos(); $('editor').showModal();
+  $('editError').textContent = ''; $('editTitle').textContent = duplicate ? 'Nueva presentación' : id ? 'Editar producto' : 'Agregar producto';
+  selectCategory(edit.category, edit.priceGroup, edit.price, p);
+  $('delete').hidden = !id || duplicate; drawPhotos(); $('editor').showModal();
 }
 function drawPhotos() {
   const area = $('photos'); area.replaceChildren();
@@ -107,7 +119,7 @@ async function save(remove) {
   try {
     if (!remove) {
       Object.assign(draft, { name:edit.title.value, description:edit.description.value, price:Number(edit.price.value),
-        stock:edit.stock.value === '' ? null : Number(edit.stock.value), available:edit.available.checked });
+        categoryId:edit.category.value, groupId:edit.priceGroup.value, stock:edit.stock.value === '' ? null : Number(edit.stock.value), available:edit.available.checked });
       for (let i = 0; i < draft.photos.length; i++) {
         const src = draft.photos[i];
         if (src.startsWith('data:')) draft.photos[i] = (await request({action:'upload', image:src.split(',')[1]})).photo;
@@ -130,13 +142,14 @@ $('login').onsubmit = async e => {
   catch (err) { note(err.message); }
 };
 $('logout').onclick = async () => { try { await request({action:'logout'}); showLogin(); note(''); } catch(e) { note(e.message); } };
+$('productFilter').onchange = renderProducts;
 $('filter').onchange = renderOrders; $('refresh').onclick = () => reload().then(() => note('Lista actualizada.')).catch(e => note(e.message));
 function tab(active) {
-  for (const name of ['orders','products','content']) {
+  for (const name of ['orders','products','content','categories']) {
     $(name).hidden = name !== active;
     $(name + 'Tab').setAttribute('aria-pressed', String(name === active));
   }
   if (active !== 'products') reload().catch(e => note(e.message));
 }
-for (const name of ['orders','products','content']) $(name + 'Tab').onclick = () => tab(name);
+for (const name of ['orders','products','content','categories']) $(name + 'Tab').onclick = () => tab(name);
 reload().catch(e => { showLogin(); if (e.status !== 401) note(e.message); });

@@ -1,8 +1,18 @@
 import { node } from './shop-client.js';
 import { money } from './order.js';
-export function drawCatalog(products) {
+export function drawCatalog(products, categories = {}) {
   const list = document.querySelector('.catalog-list');
   list.replaceChildren();
+  const buckets = new Map();
+  for (const [id, c] of Object.entries(categories)) {
+    const section = node('div', null, 'catalog-category');
+    section.append(node('h3', c.name, 'category-title'));
+    const items = node('div', null, 'catalog-category-items'); section.append(items);
+    buckets.set(id, {section, items});
+  }
+  const other = node('div', null, 'catalog-category');
+  const otherItems = node('div', null, 'catalog-category-items'); other.append(otherItems);
+  buckets.set('', {section: other, items: otherItems});
   for (const [id, p] of Object.entries(products)) {
     const article = node('article', null, 'item');
     const photos = node('div', null, 'item-photo');
@@ -30,7 +40,10 @@ export function drawCatalog(products) {
       const add = node('button', '+', 'add'); add.type = 'button'; add.dataset.product = id;
       add.setAttribute('aria-label', 'Agregar ' + p.name); side.append(add);
     } else { side.append(node('small', 'Agotado')); }
-    article.append(photos, info, side); list.append(article);
+    article.append(photos, info, side); (buckets.get(p.categoryId) || buckets.get('')).items.append(article);
+  }
+  for (const {section, items} of buckets.values()) {
+    if (items.children.length) list.append(section);
   }
   if (!list.children.length) list.append(node('p', 'Pronto habrá productos disponibles.'));
 }

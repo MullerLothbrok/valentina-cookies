@@ -1,3 +1,4 @@
+import { categoriesFor, changeCategory, changePriceGroup } from '../lib/categories.js';
 import { randomUUID } from 'node:crypto';
 import { put, del } from '@vercel/blob';
 import { changeProduct, changeStatus, createOrder, check, ShopError } from '../lib/shop.js';
@@ -13,10 +14,10 @@ export default async function handler(req, res) {
         requireAdmin(req);
         const { state } = await readState();
         const orders = Object.entries(state.orders).map(([id, { source, deducted, ...order }]) => ({ id, ...order }));
-        return res.json({ products: state.products, page: pageFor(state), originalSections, orders: orders.sort((a, b) => b.created - a.created) });
+        return res.json({ products: state.products, categories: categoriesFor(state), page: pageFor(state), originalSections, orders: orders.sort((a, b) => b.created - a.created) });
       }
       const { state } = await readState();
-      return res.json({ products: state.products, sections: pageFor(state).sections.filter(s => s.visible) });
+      return res.json({ products: state.products, categories: categoriesFor(state), sections: pageFor(state).sections.filter(s => s.visible) });
     }
     check(req.method === 'POST', 405, 'Método no permitido.');
     check(req.headers.origin && new URL(req.headers.origin).host === req.headers.host, 403, 'Abrí la página desde la dirección de la tienda.');
@@ -34,6 +35,10 @@ export default async function handler(req, res) {
       return res.json(receipt);
     } else {
       requireAdmin(req);
+      if (body.action === 'category' || body.action === 'priceGroup') {
+        await mutate(state => body.action === 'category' ? changeCategory(state, body.item) : changePriceGroup(state, body.item));
+        return res.json({ok: true});
+      }
       if (body.action === 'page') {
         const page = await mutate(state => publishPage(state, body));
         return res.json({ page });

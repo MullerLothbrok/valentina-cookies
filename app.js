@@ -38,7 +38,7 @@ async function loadCatalog() {
       const destination = document.getElementById(location.hash.slice(1));
       if (destination && !destination.hidden) requestAnimationFrame(() => destination.scrollIntoView({behavior:'instant'}));
     }
-    drawCatalog(catalog);
+    drawCatalog(catalog, data.categories);
     loaded = true; notice.hidden = true;
     restoreForm(); render();
   } catch {
