@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { put, del } from '@vercel/blob';
 import { changeProduct, changeStatus, createOrder, check, ShopError } from '../lib/shop.js';
+import { originalSections, pageFor, publishPage } from '../lib/page.js';
 import { mutate, readState } from '../lib/storage.js';
 import { cookie, orderSource, requireAdmin, verifyPassword } from '../lib/session.js';
 
@@ -12,10 +13,10 @@ export default async function handler(req, res) {
         requireAdmin(req);
         const { state } = await readState();
         const orders = Object.entries(state.orders).map(([id, { source, deducted, ...order }]) => ({ id, ...order }));
-        return res.json({ products: state.products, orders: orders.sort((a, b) => b.created - a.created) });
+        return res.json({ products: state.products, page: pageFor(state), originalSections, orders: orders.sort((a, b) => b.created - a.created) });
       }
       const { state } = await readState();
-      return res.json({ products: state.products });
+      return res.json({ products: state.products, sections: pageFor(state).sections.filter(s => s.visible) });
     }
     check(req.method === 'POST', 405, 'Método no permitido.');
     check(req.headers.origin && new URL(req.headers.origin).host === req.headers.host, 403, 'Abrí la página desde la dirección de la tienda.');
@@ -33,6 +34,10 @@ export default async function handler(req, res) {
       return res.json(receipt);
     } else {
       requireAdmin(req);
+      if (body.action === 'page') {
+        const page = await mutate(state => publishPage(state, body));
+        return res.json({ page });
+      }
       if (body.action === 'product' || body.action === 'delete') {
         const removed = await mutate(state => {
           const old = state.products[body.product?.id]?.photos || [];

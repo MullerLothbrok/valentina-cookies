@@ -1,5 +1,6 @@
 import { emptyOrder, restoreOrder, totals, money, builderError, builderLines } from './order.js';
 import { request } from './shop-client.js';
+import { displaySections } from './sections.js';
 import { drawCatalog } from './catalog.js';
 
 const STORAGE = 'valentina-order-v1';
@@ -29,10 +30,24 @@ async function loadCatalog() {
       if (!capacity(id)) delete order.cart[id];
       else order.cart[id] = Math.min(capacity(id), order.cart[id]);
     }
+    const firstDisplay = $('contenido').hidden;
+    displaySections(data.sections);
+    $('contenido').hidden = false;
+    $('pageLoadStatus').hidden = true;
+    if (firstDisplay && location.hash) {
+      const destination = document.getElementById(location.hash.slice(1));
+      if (destination && !destination.hidden) requestAnimationFrame(() => destination.scrollIntoView({behavior:'instant'}));
+    }
     drawCatalog(catalog);
     loaded = true; notice.hidden = true;
     restoreForm(); render();
   } catch {
+    if ($('contenido').hidden) {
+      const contact = document.createElement('a');
+      contact.href = 'https://wa.me/595994793372'; contact.textContent = 'consultá por WhatsApp';
+      $('pageLoadStatus').replaceChildren('No pudimos cargar la tienda. Actualizá la página o ', contact, '.');
+      $('pageLoadStatus').hidden = false;
+    }
     loaded = false;
     notice.hidden = false; notice.textContent = 'No pudimos cargar el catálogo. Actualizá la página o consultá por WhatsApp.';
     document.querySelector('.catalog-list').replaceChildren();
@@ -172,7 +187,11 @@ $('clearBuilder').addEventListener('click', () => { order.builder = emptyOrder()
 $('clearOrder').addEventListener('click', () => { rememberCheckout(null); order = emptyOrder(); restoreForm(); $('orderError').hidden = true; render(); });
 $('sendOrder').addEventListener('click', async () => {
   const error = builderError(order.builder);
-  if (error) { $('orderError').textContent = error; $('orderError').hidden = false; $('editBuilder').focus(); return; }
+  if (error) {
+    const hidden = $('arma-tu-box').hidden;
+    $('orderError').textContent = hidden ? 'El armador de box está cerrado. Quitá la idea incompleta para continuar.' : error;
+    $('orderError').hidden = false; $(hidden ? 'clearBuilder' : 'editBuilder').focus(); return;
+  }
   const button = $('sendOrder');
   if (!Object.keys(order.cart).length && !order.builder.active) {
     location.assign('https://wa.me/595994793372'); return;
@@ -204,5 +223,6 @@ document.addEventListener('keydown', event => {
   }
 });
 document.addEventListener('click', event => { if (!event.target.closest('header')) setMenu(false); });
+$('pageLoadStatus').hidden = false;
 document.querySelectorAll('[data-product]').forEach(el => { el.disabled = true; });
 await loadCatalog();

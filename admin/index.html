@@ -5,10 +5,18 @@
 <body><header><a href="/" class="brand" aria-label="Ana Valentina · Tienda"><img src="/assets/brand/ana-valentina.png" width="360" height="274" alt="Ana Valentina"></a><a href="/">Ver tienda ↗</a></header>
 <main><h1>Administrar tienda</h1><p id="notice" class="notice" role="status" hidden></p>
 <form id="login" class="card login" hidden><label>Clave del panel<input name="password" type="password" autocomplete="current-password" required></label><button>Ingresar</button></form>
-<section id="dashboard" hidden><nav aria-label="Gestión"><button id="productsTab" aria-pressed="true">Productos</button><button id="ordersTab" aria-pressed="false">Pedidos nacionales</button><button id="logout" class="secondary">Salir</button></nav>
+<section id="dashboard" hidden><nav aria-label="Gestión"><button id="productsTab" aria-pressed="true">Productos</button><button id="ordersTab" aria-pressed="false">Pedidos nacionales</button><button id="contentTab" aria-pressed="false">Contenido de la página</button><button id="logout" class="secondary">Salir</button></nav>
 <section id="products"><div class="heading"><h2>Productos</h2><button id="add">Agregar producto</button></div><div id="productList" class="list"></div></section>
 <section id="orders" hidden><div class="heading"><h2>Pedidos nacionales</h2><button class="secondary" id="refresh">Actualizar</button></div>
 <label class="filter">Estado<select id="filter"><option value="">Todos</option><option value="pendiente">Pendientes</option><option value="confirmado">Confirmados</option><option value="enviado">Enviados</option><option value="cancelado">Cancelados</option></select></label><div id="orderList" class="list"></div></section>
+<section id="content" hidden>
+<div class="heading"><h2>Contenido de la página</h2></div>
+<p>Ordená las secciones y editá sus títulos y textos. Los cambios aparecen en la tienda al publicarlos.</p>
+<fieldset id="pageControls"><legend class="visually-hidden">Editor de secciones</legend>
+<div class="actions"><button type="button" id="addSection">Agregar sección</button><select id="restoreSection" aria-label="Recuperar sección original" hidden></select></div>
+<div id="sectionList" class="list"></div>
+</fieldset><div class="page-actions"><span id="pageStatus" role="status"></span>
+<button type="button" id="publishPage" disabled>Publicar cambios</button><button type="button" class="secondary" id="discardPage" disabled>Descartar cambios</button></div></section>
 </section></main>
 <dialog id="editor"><form id="edit"><div class="heading"><h2 id="editTitle">Editar producto</h2><button type="button" class="secondary" id="close">Cerrar</button></div>
 <label>Nombre<input name="title" maxlength="100" required></label>

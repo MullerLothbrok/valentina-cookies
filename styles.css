@@ -259,3 +259,11 @@ footer{padding-right:170px}
 .shipping-fields label{display:grid;gap:.25rem;font-weight:700}
 .shipping-fields input{width:100%;padding:.65rem;border:1px solid var(--ink);border-radius:8px;font:inherit}
 .shipping-fields small{line-height:1.5}.product-thumb{background:none;padding:.15rem;border:0}.product-thumb img{width:58px;height:64px;object-fit:cover;border-radius:6px}
+
+[data-page-body]{white-space:pre-line}
+[data-page-title],[data-page-body]{overflow-wrap:anywhere}
+.custom-section{background:var(--cream);border-bottom:var(--line)}
+.custom-section p{max-width:68ch;font-size:clamp(1rem,2vw,1.3rem);line-height:1.6;margin:1.25rem 0 0}
+
+#pageLoadStatus{min-height:40vh;padding:4rem 5vw}
+#pageLoadStatus a{text-decoration:underline}

@@ -35,12 +35,13 @@
   <button class="cart-btn" data-open-cart>Pedido <span id="count">0</span></button>
 </header>
 
-<main id="contenido">
+<p id="pageLoadStatus" class="wrap" role="status" hidden>Cargando la tienda…</p>
+<main id="contenido" hidden>
 <section class="hero" id="inicio">
   <div class="hero-copy">
     <div class="eyebrow">ENCARNACIÓN · PARAGUAY</div>
-    <h1 class="display">COOKIES QUE <span class="hot">SE NOTAN.</span></h1>
-    <p>Cookies estilo americano, boxes, regalos y pedidos personalizados para convertir un antojo en algo que también se quiere regalar.</p>
+    <h1 data-page-title class="display">COOKIES QUE <span class="hot">SE NOTAN.</span></h1>
+    <p data-page-body>Cookies estilo americano, boxes, regalos y pedidos personalizados para convertir un antojo en algo que también se quiere regalar.</p>
     <div class="hero-proof">
       <span>Cookies & boxes</span><span>Pedidos personalizados</span><span>Envíos a todo Paraguay</span>
     </div>
@@ -56,15 +57,15 @@
   </div>
 </section>
 
-<section class="statement reveal">
-  No hacemos postres para pasar desapercibidos.<br>
-  <b>Cookies que se notan.</b> <em>Regalos que se recuerdan.</em>
+<section class="statement reveal" id="frase">
+  <span data-page-title>No hacemos postres para pasar desapercibidos.</span><br>
+  <span data-page-body><b>Cookies que se notan.</b> <em>Regalos que se recuerdan.</em></span>
 </section>
 
 <section class="section" id="mundo">
   <div class="head reveal">
-    <div><div class="eyebrow">EL MUNDO VALENTINA</div><h2 class="display section-title">Elegí el mood.</h2></div>
-    <p>Cookies para hoy, cajas para regalar y detalles para celebrar. Elegí una categoría y contanos qué te gustaría pedir.</p>
+    <div><div class="eyebrow">EL MUNDO VALENTINA</div><h2 data-page-title class="display section-title">Elegí el mood.</h2></div>
+    <p data-page-body>Cookies para hoy, cajas para regalar y detalles para celebrar. Elegí una categoría y contanos qué te gustaría pedir.</p>
   </div>
   <div class="category-grid"><a class="category reveal" href="#catalogo"><span class="pill">Cookies</span><img src="assets/photos/DSC_6225-480.webp" srcset="assets/photos/DSC_6225-480.webp 480w, assets/photos/DSC_6225-800.webp 800w, assets/photos/DSC_6225-1200.webp 1200w" sizes="(max-width: 780px) 100vw, (max-width: 1100px) 50vw, 45vw" width="4024" height="6048" alt="Cookies decoradas con crema, chocolate y frutillas" loading="lazy" decoding="async"><div class="category-overlay"><h3>Cookies que se notan.</h3><p>Clásicas, cargadas, rellenas y con toppings.</p><span class="category-link">Ver cookies →</span></div></a><a class="category reveal" href="#arma-tu-box" data-interest="Rolls de canela"><span class="pill">Rolls</span><img src="assets/photos/roll-chocolate-480.webp" srcset="assets/photos/roll-chocolate-480.webp 480w, assets/photos/roll-chocolate-800.webp 800w, assets/photos/roll-chocolate-1200.webp 1200w" sizes="(max-width: 780px) 100vw, (max-width:1100px) 50vw, 40vw" width="4024" height="6048" alt="Roll de canela con cobertura de chocolate" loading="lazy" decoding="async"><div class="category-overlay"><h3>Rolls de canela.</h3><p>Consultá las opciones disponibles para tu pedido.</p><span class="category-link">Consultar rolls →</span></div></a><a class="category reveal" href="#arma-tu-box" data-interest="Regalo"><span class="pill">Regalos</span><img src="assets/photos/archive-10-480.webp" srcset="assets/photos/archive-10-480.webp 480w, assets/photos/archive-10-800.webp 800w, assets/photos/archive-10-820.webp 820w" sizes="(max-width: 780px) 100vw, (max-width: 1100px) 50vw, 45vw" width="820" height="1230" alt="Caja abierta de colores con cookies variadas" loading="lazy" decoding="async"><div class="category-overlay"><h3>Boxes con intención.</h3><p>Para cumpleaños, amistad, empresas o porque sí.</p><span class="category-link">Armar un regalo →</span></div></a><a class="category reveal" href="#arma-tu-box" data-interest="Cookie cup"><span class="pill">Cookie cup</span><img src="assets/photos/DSC_1224-480.webp" srcset="assets/photos/DSC_1224-480.webp 480w, assets/photos/DSC_1224-800.webp 800w, assets/photos/DSC_1224-1200.webp 1200w" sizes="(max-width: 780px) 100vw, (max-width: 1100px) 50vw, 45vw" width="3677" height="5515" alt="Vaso comestible de cookie revestido de chocolate" loading="lazy" decoding="async"><div class="category-overlay"><h3>Tomate la cookie.</h3><p>Un vaso de cookie para acompañar tu café.</p><span class="category-link">Consultar cookie cup →</span></div></a><a class="category reveal" href="#personalizados"><span class="pill">Personalizadas</span><img src="assets/photos/DSC_6233-480.webp" srcset="assets/photos/DSC_6233-480.webp 480w, assets/photos/DSC_6233-800.webp 800w, assets/photos/DSC_6233-1200.webp 1200w" sizes="(max-width: 780px) 100vw, (max-width: 1100px) 50vw, 45vw" width="4024" height="6048" alt="Cookie decorada con una cara sonriente de chocolate blanco" loading="lazy" decoding="async"><div class="category-overlay"><h3>Diseños a medida.</h3><p>Contanos tu temática, colores y ocasión.</p><span class="category-link">Ver personalizados →</span></div></a><a class="category reveal" href="#arma-tu-box" data-interest="Postres"><span class="pill">Postres</span><img src="assets/photos/DSC_8315-480.webp" srcset="assets/photos/DSC_8315-480.webp 480w, assets/photos/DSC_8315-800.webp 800w, assets/photos/DSC_8315-1200.webp 1200w" sizes="(max-width: 780px) 100vw, (max-width: 1100px) 50vw, 45vw" width="1393" height="2068" alt="Postre de cookie y chocolate servido en un recipiente" loading="lazy" decoding="async"><div class="category-overlay"><h3>Más allá de la cookie.</h3><p>Brownies, potes, cookie pies y ediciones especiales.</p><span class="category-link">Consultar postres →</span></div></a></div>
 </section>
@@ -73,8 +74,8 @@
   <div class="builder-shell">
     <div class="builder-intro reveal">
       <div class="eyebrow">PEDIDO GUIADO</div>
-      <h2 class="display section-title">Armá tu box.</h2>
-      <p>Elegí para quién es, qué te gustaría incluir y una cantidad aproximada. La página arma el mensaje y Valentina confirma sabores, diseños, precio final y entrega.</p>
+      <h2 data-page-title class="display section-title">Armá tu box.</h2>
+      <p data-page-body>Elegí para quién es, qué te gustaría incluir y una cantidad aproximada. La página arma el mensaje y Valentina confirma sabores, diseños, precio final y entrega.</p>
       <p class="mini-note">¿Todavía no sabés qué elegir? Contanos la ocasión y te ayudamos. Tu idea se guarda junto con los productos que agregues al pedido.</p>
     </div>
 
@@ -129,8 +130,8 @@
 
 <section class="section occasions" id="ocasiones">
   <div class="head reveal">
-    <div><div class="eyebrow">NO TODO ES “COMPRAR COOKIES”</div><h2 class="display section-title">Resolvé la ocasión.</h2></div>
-    <p>Un cumpleaños, una sorpresa o un detalle para tu equipo. Contanos la ocasión y preparamos una propuesta para vos.</p>
+    <div><div class="eyebrow">NO TODO ES “COMPRAR COOKIES”</div><h2 data-page-title class="display section-title">Resolvé la ocasión.</h2></div>
+    <p data-page-body>Un cumpleaños, una sorpresa o un detalle para tu equipo. Contanos la ocasión y preparamos una propuesta para vos.</p>
   </div>
   <div class="occasion-grid">
     <article class="occasion reveal"><div><div class="occasion-icon">🎁</div><h3>Regalos</h3><p>Boxes con intención, dedicatoria y una presentación que ya llega lista para regalar.</p></div><a href="#arma-tu-box" data-interest="Regalo">Armar un regalo →</a></article>
@@ -143,8 +144,8 @@
 <section class="catalog" id="catalogo">
   <div class="catalog-inner">
     <div class="head reveal">
-      <div><div class="eyebrow">NUESTRO CATÁLOGO</div><h2 class="display section-title">Elegí. Sumá. Pedí.</h2></div>
-      <p>Agregá productos al pedido. Al finalizar, la web arma un único mensaje de WhatsApp para confirmar disponibilidad, personalización y entrega.</p>
+      <div><div class="eyebrow">NUESTRO CATÁLOGO</div><h2 data-page-title class="display section-title">Elegí. Sumá. Pedí.</h2></div>
+      <p data-page-body>Agregá productos al pedido. Al finalizar, la web arma un único mensaje de WhatsApp para confirmar disponibilidad, personalización y entrega.</p>
     </div>
     <p id="catalogNotice" role="status" hidden></p><div class="catalog-list"><article class="item reveal"><div class="item-photo"><img src="assets/photos/cookies-con-diseno-160.webp" srcset="assets/photos/cookies-con-diseno-160.webp 160w, assets/photos/cookies-con-diseno-320.webp 320w" sizes="(max-width: 780px) 64px, 82px" width="1696" height="3024" alt="Cookies de distintos sabores con toppings y diseños" loading="lazy" decoding="async"></div><div><h3>Galleta individual</h3><p>Galleta con diseño / unidad.</p></div><div class="item-side"><div class="price">Gs. 9.000</div><button type="button" class="add" aria-label="Agregar galleta individual" data-product="galleta">+</button></div></article><article class="item reveal"><div class="item-photo"><img src="assets/photos/archive-20-160.webp" srcset="assets/photos/archive-20-160.webp 160w, assets/photos/archive-20-320.webp 320w" sizes="(max-width: 780px) 72px, 82px" width="900" height="1350" alt="Caja abierta con tres cookies surtidas" loading="lazy" decoding="async"></div><div><h3>3 cookies rellenas</h3><p>Cajita de 3 cookies rellenas.</p></div><div class="item-side"><div class="price">Gs. 45.000</div><button type="button" class="add" aria-label="Agregar 3 cookies rellenas" data-product="caja3">+</button></div></article><article class="item reveal"><div class="item-photo"><img src="assets/photos/DSC_6218-160.webp" srcset="assets/photos/DSC_6218-160.webp 160w, assets/photos/DSC_6218-320.webp 320w" sizes="(max-width: 780px) 72px, 82px" width="4024" height="6048" alt="Caja de Valentina con cookies decoradas" loading="lazy" decoding="async"></div><div><h3>Cajita de la amistad</h3><p>Box especial para regalar.</p></div><div class="item-side"><div class="price">A consultar</div><button type="button" class="add" aria-label="Agregar cajita de la amistad" data-product="amistad">+</button></div></article><article class="item reveal"><div class="item-photo"><img src="assets/photos/archive-9-160.webp" srcset="assets/photos/archive-9-160.webp 160w, assets/photos/archive-9-320.webp 320w" sizes="(max-width: 780px) 72px, 82px" width="820" height="1230" alt="Recipiente con mini cookies de distintos colores" loading="lazy" decoding="async"></div><div><h3>Mini cookies para compartir</h3><p>8 mini cookies + salsita.</p></div><div class="item-side"><div class="price">Gs. 50.000</div><button type="button" class="add" aria-label="Agregar mini cookies para compartir" data-product="mini">+</button></div></article><article class="item reveal"><div class="item-photo"><img src="assets/photos/archive-12-160.webp" srcset="assets/photos/archive-12-160.webp 160w, assets/photos/archive-12-320.webp 320w" sizes="(max-width: 780px) 72px, 82px" width="760" height="1140" alt="Cookie con trozos de chocolate sobre fondo amarillo" loading="lazy" decoding="async"></div><div><h3>Cookie rellena</h3><p>Cookie rellena / unidad.</p></div><div class="item-side"><div class="price">Gs. 15.000</div><button type="button" class="add" aria-label="Agregar cookie rellena" data-product="rellena">+</button></div></article><article class="item reveal"><div class="item-photo"><img src="assets/photos/cookies-y-alfajores-160.webp" srcset="assets/photos/cookies-y-alfajores-160.webp 160w, assets/photos/cookies-y-alfajores-320.webp 320w" sizes="(max-width: 780px) 64px, 82px" width="4000" height="6000" alt="Cajita de cookies con alfajores y decoraciones variadas" loading="lazy" decoding="async"></div><div><h3>Cookies & alfajor</h3><p>Cajita combinada.</p></div><div class="item-side"><div class="price">Gs. 30.000</div><button type="button" class="add" aria-label="Agregar cookies & alfajor" data-product="alfajor">+</button></div></article><article class="item reveal"><div class="item-photo"><img src="assets/photos/DSC_8383-160.webp" srcset="assets/photos/DSC_8383-160.webp 160w, assets/photos/DSC_8383-320.webp 320w" sizes="(max-width: 780px) 72px, 82px" width="1696" height="3024" alt="Cajas abiertas con productos decorados variados" loading="lazy" decoding="async"></div><div><h3>Pedidos especiales</h3><p>Boxes, postres, eventos y cantidades especiales.</p></div><div class="item-side"><div class="price">A consultar</div><button type="button" class="add" aria-label="Agregar pedidos especiales" data-product="especial">+</button></div></article></div>
     <p class="note">Precios sujetos a actualización. Los productos “a consultar” se confirman directamente por WhatsApp.</p>
@@ -153,8 +154,8 @@
 
 <section class="section process" id="como-pedir">
   <div class="head reveal">
-    <div><div class="eyebrow">CERO VUELTAS</div><h2 class="display section-title">Así de simple.</h2></div>
-    <p>Elegí lo que te gusta, sumá los detalles y consultanos por WhatsApp. Te confirmamos disponibilidad, precio final y entrega.</p>
+    <div><div class="eyebrow">CERO VUELTAS</div><h2 data-page-title class="display section-title">Así de simple.</h2></div>
+    <p data-page-body>Elegí lo que te gusta, sumá los detalles y consultanos por WhatsApp. Te confirmamos disponibilidad, precio final y entrega.</p>
   </div>
   <div class="process-grid">
     <article class="process-step reveal"><div class="process-num">1</div><h3>Elegí</h3><p>Usá el catálogo o el armador de box según lo que estés buscando.</p></article>
@@ -165,8 +166,8 @@
 
 <section class="editorial" id="fotos">
   <div class="editorial-head reveal">
-    <div><div class="eyebrow">HECHO PARA ANTOJARSE</div><h2 class="display section-title">Miralo de cerca.</h2></div>
-    <p>Chocolate, color y muchas ganas de probar. Tocá una foto para descubrir los detalles.</p>
+    <div><div class="eyebrow">HECHO PARA ANTOJARSE</div><h2 data-page-title class="display section-title">Miralo de cerca.</h2></div>
+    <p data-page-body>Chocolate, color y muchas ganas de probar. Tocá una foto para descubrir los detalles.</p>
   </div>
   <div class="photo-grid"><button type="button" class="shot reveal" data-full="assets/photos/DSC_8350-1468.webp" aria-label="Ampliar: Cucharada de un postre con cobertura verde"><img src="assets/photos/DSC_8350-480.webp" srcset="assets/photos/DSC_8350-480.webp 480w, assets/photos/DSC_8350-800.webp 800w, assets/photos/DSC_8350-1200.webp 1200w, assets/photos/DSC_8350-1468.webp 1468w" sizes="(max-width: 780px) 100vw, (max-width: 1100px) 50vw, 45vw" width="1468" height="2157" alt="Cucharada de un postre con cobertura verde" loading="lazy" decoding="async"><span class="shot-label">COLOR + TEXTURA</span></button><button type="button" class="shot reveal" data-full="assets/photos/DSC_8334-1589.webp" aria-label="Ampliar: Postre con sprinkles y salsa de caramelo"><img src="assets/photos/DSC_8334-480.webp" srcset="assets/photos/DSC_8334-480.webp 480w, assets/photos/DSC_8334-800.webp 800w, assets/photos/DSC_8334-1200.webp 1200w, assets/photos/DSC_8334-1589.webp 1589w" sizes="(max-width: 780px) 100vw, (max-width: 1100px) 50vw, 45vw" width="1589" height="2437" alt="Postre con sprinkles y salsa de caramelo" loading="lazy" decoding="async"><span class="shot-label">A CUCHARADAS</span></button><button type="button" class="shot reveal" data-full="assets/photos/roll-frutilla-1600.webp" aria-label="Ampliar: Roll de canela con crema y frutillas"><img src="assets/photos/roll-frutilla-480.webp" srcset="assets/photos/roll-frutilla-480.webp 480w, assets/photos/roll-frutilla-800.webp 800w, assets/photos/roll-frutilla-1200.webp 1200w, assets/photos/roll-frutilla-1600.webp 1600w" sizes="(max-width: 780px) 100vw, (max-width:1100px) 50vw, 40vw" width="4024" height="6048" alt="Roll de canela con crema y frutillas" loading="lazy" decoding="async"><span class="shot-label">ROLLS CON FRUTILLA</span></button><button type="button" class="shot reveal" data-full="assets/photos/DSC_8265-1600.webp" aria-label="Ampliar: Decoración de un postre con una manga de chocolate"><img src="assets/photos/DSC_8265-480.webp" srcset="assets/photos/DSC_8265-480.webp 480w, assets/photos/DSC_8265-800.webp 800w, assets/photos/DSC_8265-1200.webp 1200w, assets/photos/DSC_8265-1600.webp 1600w" sizes="(max-width: 780px) 100vw, (max-width: 1100px) 50vw, 45vw" width="1696" height="3024" alt="Decoración de un postre con una manga de chocolate" loading="lazy" decoding="async"><span class="shot-label">HECHO A MANO</span></button><button type="button" class="shot reveal" data-full="assets/photos/rolls-y-cookies-1600.webp" aria-label="Ampliar: Selección de rolls y cookies en cajas de Valentina"><img src="assets/photos/rolls-y-cookies-480.webp" srcset="assets/photos/rolls-y-cookies-480.webp 480w, assets/photos/rolls-y-cookies-800.webp 800w, assets/photos/rolls-y-cookies-1200.webp 1200w, assets/photos/rolls-y-cookies-1600.webp 1600w" sizes="(max-width: 780px) 100vw, (max-width:1100px) 50vw, 40vw" width="4024" height="6048" alt="Selección de rolls y cookies en cajas de Valentina" loading="lazy" decoding="async"><span class="shot-label">ROLLS & COOKIES</span></button><button type="button" class="shot reveal" data-full="assets/photos/DSC_6221-1600.webp" aria-label="Ampliar: Caja de tres cookies con toppings"><img src="assets/photos/DSC_6221-480.webp" srcset="assets/photos/DSC_6221-480.webp 480w, assets/photos/DSC_6221-800.webp 800w, assets/photos/DSC_6221-1200.webp 1200w, assets/photos/DSC_6221-1600.webp 1600w" sizes="(max-width: 780px) 100vw, (max-width: 1100px) 50vw, 45vw" width="3740" height="5621" alt="Caja de tres cookies con toppings" loading="lazy" decoding="async"><span class="shot-label">LISTAS PARA REGALAR</span></button></div>
 </section>
@@ -175,8 +176,8 @@
   <div class="feature-grid">
     <div class="feature-copy reveal">
       <div class="eyebrow">PERSONALIZADOS · EVENTOS · EMPRESAS</div>
-      <h2 class="display section-title">Tu idea, en versión Valentina.</h2>
-      <p>Cookies decoradas y boxes para cumpleaños, eventos, equipos y marcas. Contanos tu temática, la cantidad y la fecha: te ayudamos a elegir los detalles.</p>
+      <h2 data-page-title class="display section-title">Tu idea, en versión Valentina.</h2>
+      <p data-page-body>Cookies decoradas y boxes para cumpleaños, eventos, equipos y marcas. Contanos tu temática, la cantidad y la fecha: te ayudamos a elegir los detalles.</p>
       <div class="corporate-strip">
         <div>Cookies con temática</div><div>Boxes para regalar</div><div>Pedidos por cantidad</div>
       </div>
@@ -189,21 +190,21 @@
   </div>
 </section>
 
-<section class="brand">
+<section class="brand" id="marca">
   <div class="brand-copy reveal">
     <div class="eyebrow">VALENTINA, SIN DISFRAZARSE</div>
-    <h2 class="display brand-title">Dulce, pop y un poco exagerado.</h2>
-    <p>Cookies con mucho sabor, combinaciones para descubrir y cajas llenas de color. Hechas en Encarnación para compartir, regalar o darte un gusto.</p>
+    <h2 data-page-title class="display brand-title">Dulce, pop y un poco exagerado.</h2>
+    <p data-page-body>Cookies con mucho sabor, combinaciones para descubrir y cajas llenas de color. Hechas en Encarnación para compartir, regalar o darte un gusto.</p>
     <div class="brand-tags"><span class="brand-tag">Hecho en Encarnación</span><span class="brand-tag">Envíos a todo Paraguay</span><span class="brand-tag">Pedidos personalizados</span></div>
   </div>
   <div class="brand-visual"><img src="DSC_6232.jpg" width="4024" height="6048" alt="Cookie decorada con chocolate, crema y una frutilla bañada en chocolate" loading="lazy" decoding="async"></div>
 </section>
 
-<section class="final">
+<section class="final" id="contacto">
   <div class="final-copy reveal">
     <div class="eyebrow">ENCARNACIÓN · PARAGUAY</div>
-    <h2 class="display final-title">Tu próximo antojo empieza acá.</h2>
-    <p>Elegí del catálogo, armá un box o contanos la ocasión. Todo termina en un mensaje ordenado y listo para coordinar.</p>
+    <h2 data-page-title class="display final-title">Tu próximo antojo empieza acá.</h2>
+    <p data-page-body>Elegí del catálogo, armá un box o contanos la ocasión. Todo termina en un mensaje ordenado y listo para coordinar.</p>
     <div class="actions">
       <a class="btn dark" href="https://wa.me/595994793372?text=Hola%20Valentina%20%F0%9F%8D%AA%20Quiero%20hacer%20un%20pedido." target="_blank" rel="noopener">WhatsApp</a>
       <a class="btn" href="https://instagram.com/valentinacookiespy" target="_blank" rel="noopener">@valentinacookiespy</a>

@@ -1,4 +1,5 @@
 import { request, node } from '../shop-client.js';
+import { loadPageEditor, resetPageEditor } from './sections.js';
 import { money } from '../order.js';
 
 const $ = id => document.getElementById(id);
@@ -8,6 +9,7 @@ function note(message) {
   $('notice').textContent = message; $('notice').hidden = !message;
 }
 function showLogin() {
+  resetPageEditor();
   data = null; $('dashboard').hidden = true; $('login').hidden = false;
   $('productList').replaceChildren(); $('orderList').replaceChildren();
 }
@@ -15,7 +17,7 @@ async function reload() {
   try {
     data = await request(null, '?view=admin');
     $('login').hidden = true; $('dashboard').hidden = false;
-    renderProducts(); renderOrders();
+    renderProducts(); renderOrders(); loadPageEditor(data.page, data.originalSections);
   } catch (error) {
     if (error.status === 401) showLogin();
     throw error;
@@ -129,10 +131,12 @@ $('login').onsubmit = async e => {
 };
 $('logout').onclick = async () => { try { await request({action:'logout'}); showLogin(); note(''); } catch(e) { note(e.message); } };
 $('filter').onchange = renderOrders; $('refresh').onclick = () => reload().then(() => note('Lista actualizada.')).catch(e => note(e.message));
-function tab(orders) {
-  $('products').hidden = orders; $('orders').hidden = !orders;
-  $('productsTab').setAttribute('aria-pressed', String(!orders)); $('ordersTab').setAttribute('aria-pressed', String(orders));
-  if (orders) reload().catch(e => note(e.message));
+function tab(active) {
+  for (const name of ['orders','products','content']) {
+    $(name).hidden = name !== active;
+    $(name + 'Tab').setAttribute('aria-pressed', String(name === active));
+  }
+  if (active !== 'products') reload().catch(e => note(e.message));
 }
-$('ordersTab').onclick = () => tab(true); $('productsTab').onclick = () => tab(false);
+for (const name of ['orders','products','content']) $(name + 'Tab').onclick = () => tab(name);
 reload().catch(e => { showLogin(); if (e.status !== 401) note(e.message); });
