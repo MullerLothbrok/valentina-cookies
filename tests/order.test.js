@@ -47,7 +47,8 @@ test('published markup and assets agree with catalog and contain no duplicate ph
   const ids = [...html.matchAll(/data-product="([^"]+)"/g)].map(m => m[1]);
   assert.deepEqual(ids.sort(), Object.keys(CATALOG).sort());
   const images = [...html.matchAll(/<img[^>]+src="([^"]+)"/g)].map(m => m[1]);
-  assert.equal(new Set(images).size, images.length);
+  const photos = images.filter(path => !path.startsWith('/assets/brand/'));
+  assert.equal(new Set(photos).size, photos.length);
   for (const path of [...images, ...[...html.matchAll(/data-full="([^"]+)"/g)].map(m => m[1])]) assert.ok(existsSync(new URL('../' + path, import.meta.url)), path);
   for (const name of ['valor de cada consulta', 'CATÁLOGO BASE', 'ROLL LOVE', 'onclick=', 'glasé', 'data-product="paleta"']) assert.ok(!html.includes(name), name);
   assert.match(html, /id="customQty"/); assert.match(html, /<\/form>/);
