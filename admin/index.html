@@ -15,10 +15,14 @@
 <section id="content" hidden>
 <div class="heading"><h2>Contenido de la página</h2></div>
 <p>Ordená las secciones y editá sus títulos y textos. Los cambios aparecen en la tienda al publicarlos.</p>
-<fieldset id="pageControls"><legend class="visually-hidden">Editor de secciones</legend>
+<div class="content-workspace"><div class="content-fields"><fieldset id="pageControls"><legend class="visually-hidden">Editor de secciones</legend>
 <div class="actions"><button type="button" id="addSection">Agregar sección</button><select id="restoreSection" aria-label="Recuperar sección original" hidden></select></div>
 <div id="sectionList" class="list"></div>
-</fieldset><div class="page-actions"><span id="pageStatus" role="status"></span>
+</fieldset></div><aside id="previewPane" class="preview-pane">
+<div class="preview-toolbar"><strong>Vista previa</strong><select id="previewSize" aria-label="Tamaño de vista previa"><option value="desktop">Computadora</option><option value="phone">Celular</option></select><button type="button" id="closePreview" class="secondary">Volver a editar</button></div>
+<p class="muted">Tocá una sección para editarla.</p><p id="previewLoading" role="status">Cargando vista previa…</p>
+<div class="preview-canvas"><iframe id="pagePreview" title="Vista previa de la tienda" src="/?preview=editor" sandbox="allow-scripts allow-same-origin"></iframe></div>
+</aside></div><div class="page-actions"><button type="button" id="showPreview" class="secondary">Ver vista previa</button><span id="pageStatus" role="status"></span>
 <button type="button" id="publishPage" disabled>Publicar cambios</button><button type="button" class="secondary" id="discardPage" disabled>Descartar cambios</button></div></section>
 </section></main>
 <dialog id="categoryEditor"><form id="categoryForm"><h2>Agregar categoría</h2><label>Nombre de categoría<input id="categoryName" maxlength="100" required></label><p id="categoryError" role="alert"></p><div class="actions"><button>Crear categoría</button><button type="button" class="secondary" id="closeCategory">Cerrar</button></div></form></dialog>
@@ -30,5 +34,5 @@
 <label>Unidades disponibles<input type="number" name="stock" min="0" max="999999" step="1"><small>Dejá vacío para vender por encargo.</small></label></div>
 <label class="check"><input type="checkbox" name="available">Disponible para pedidos</label>
 <label>Fotos<input id="files" type="file" multiple accept="image/*"><small>Hasta 6 fotos. La primera aparece en el catálogo.</small></label><div id="photos"></div>
-<p id="editError" role="alert"></p><div class="heading"><button id="save">Guardar producto</button><button id="delete" type="button" class="danger">Eliminar producto</button></div>
+<details id="productPreviewPanel"><summary>Ver cómo queda en el catálogo</summary><iframe id="productPreview" title="Vista previa del producto" src="/?preview=editor" sandbox="allow-scripts allow-same-origin"></iframe></details><p id="editError" role="alert"></p><div class="heading"><button id="save">Guardar producto</button><button id="delete" type="button" class="danger">Eliminar producto</button></div>
 </form></dialog><script type="module" src="/admin/panel.js"></script></body></html>

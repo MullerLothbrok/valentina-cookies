@@ -1,3 +1,4 @@
+import { previewSections } from './preview.js';
 import { node, request } from '../shop-client.js';
 
 const $ = id => document.getElementById(id);
@@ -10,6 +11,7 @@ function status(message) {
 }
 function changed() {
   dirty = true;
+  previewSections(sections, document.activeElement?.closest('.page-card')?.dataset.id);
   status(conflict ? 'La página cambió en otra sesión. Descartá esta edición para cargar la actual.' : 'Hay cambios sin publicar.');
 }
 function button(label, fn, disabled = false) {
@@ -27,6 +29,7 @@ function draw(openId) {
   for (const [index, s] of sections.entries()) {
     const card = node('details', null, 'card page-card');
     card.open = s.id === openId;
+    card.ontoggle = () => { if (card.open) previewSections(sections, s.id); };
     const summary = node('summary');
     const name = node('strong', s.title || 'Nueva sección');
     const badge = node('small', s.visible ? '' : 'Oculta');
@@ -58,6 +61,7 @@ function draw(openId) {
     if (!sections.some(item => item.id === s.id)) select.add(new Option(s.title, s.id));
   }
   select.hidden = select.options.length <= 1;
+  previewSections(sections, openId);
 }
 function focusCard(id, selector = 'summary') {
   $('sectionList').querySelector('[data-id="' + id + '"] ' + selector)?.focus();

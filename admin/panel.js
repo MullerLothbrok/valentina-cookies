@@ -1,3 +1,4 @@
+import { previewCatalog, previewProduct } from './preview.js';
 import { request, node } from '../shop-client.js';
 import { loadPageEditor, resetPageEditor } from './sections.js';
 import { loadCategories, selectCategory, setCategoryProducts } from './categories.js';
@@ -10,6 +11,7 @@ function note(message) {
   $('notice').textContent = message; $('notice').hidden = !message;
 }
 function showLogin() {
+  document.body.classList.remove('content-editing');
   resetPageEditor();
   data = null; $('dashboard').hidden = true; $('login').hidden = false;
   $('productList').replaceChildren(); $('orderList').replaceChildren();
@@ -18,6 +20,7 @@ async function reload() {
   try {
     data = await request(null, '?view=admin');
     $('login').hidden = true; $('dashboard').hidden = false;
+    previewCatalog(data);
     setCategoryProducts(data.products); loadCategories(data.categories, reload, note); renderProducts(); renderOrders(); loadPageEditor(data.page, data.originalSections);
   } catch (error) {
     if (error.status === 401) showLogin();
@@ -82,9 +85,11 @@ function openEditor(id, duplicate = false) {
   edit.stock.value = p.stock ?? ''; edit.available.checked = p.available; $('files').value = '';
   $('editError').textContent = ''; $('editTitle').textContent = duplicate ? 'Nueva presentación' : id ? 'Editar producto' : 'Agregar producto';
   selectCategory(edit.category, edit.priceGroup, edit.price, p);
-  $('delete').hidden = !id || duplicate; drawPhotos(); $('editor').showModal();
+  $('delete').hidden = !id || duplicate;
+  $('productPreviewPanel').open = true; drawPhotos(); $('editor').showModal();
 }
 function drawPhotos() {
+  updateProductPreview();
   const area = $('photos'); area.replaceChildren();
   draft.photos.forEach((photo, i) => {
     const box = node('div'); const img = node('img');
@@ -145,6 +150,7 @@ $('logout').onclick = async () => { try { await request({action:'logout'}); show
 $('productFilter').onchange = renderProducts;
 $('filter').onchange = renderOrders; $('refresh').onclick = () => reload().then(() => note('Lista actualizada.')).catch(e => note(e.message));
 function tab(active) {
+  document.body.classList.toggle('content-editing', active === 'content');
   for (const name of ['orders','products','content','categories']) {
     $(name).hidden = name !== active;
     $(name + 'Tab').setAttribute('aria-pressed', String(name === active));
@@ -153,3 +159,12 @@ function tab(active) {
 }
 for (const name of ['orders','products','content','categories']) $(name + 'Tab').onclick = () => tab(name);
 reload().catch(e => { showLogin(); if (e.status !== 401) note(e.message); });
+
+function updateProductPreview() {
+  if (!draft) return;
+  previewProduct({...draft, name:edit.title.value, description:edit.description.value, price:Number(edit.price.value),
+    stock:edit.stock.value === '' ? null : Number(edit.stock.value), available:edit.available.checked,
+    categoryId:edit.category.value, groupId:edit.priceGroup.value});
+}
+$('edit').addEventListener('input', updateProductPreview);
+$('edit').addEventListener('change', updateProductPreview);

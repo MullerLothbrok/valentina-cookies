@@ -1,3 +1,4 @@
+import { previewMode, startPreview } from './preview-mode.js';
 import { emptyOrder, restoreOrder, totals, money, builderError, builderLines } from './order.js';
 import { request } from './shop-client.js';
 import { displaySections } from './sections.js';
@@ -59,7 +60,7 @@ let inertElements = [];
 const form = $('builderForm');
 
 function persist() {
-  if (!loaded) return;
+  if (!loaded || previewMode) return;
   try { localStorage.setItem(STORAGE, JSON.stringify(order)); } catch { /* Ordering also works without storage. */ }
 }
 function render() {
@@ -225,4 +226,4 @@ document.addEventListener('keydown', event => {
 document.addEventListener('click', event => { if (!event.target.closest('header')) setMenu(false); });
 $('pageLoadStatus').hidden = false;
 document.querySelectorAll('[data-product]').forEach(el => { el.disabled = true; });
-await loadCatalog();
+if (previewMode) startPreview(); else await loadCatalog();
