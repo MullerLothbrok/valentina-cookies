@@ -14,21 +14,27 @@ for (const section of main.querySelectorAll(':scope > section')) {
   originals.set(section.id, {photos, section, title: title.cloneNode(true), body: body.cloneNode(true)});
 }
 function setCopy(field, value, original) {
+  field.hidden = !value;
+  if (field.textContent === value) return;
   if (original && value === original.textContent) {
     field.replaceChildren(...Array.from(original.childNodes, child => child.cloneNode(true)));
   } else {
     field.textContent = value;
   }
-  field.hidden = !value;
 }
 export function displaySections(sections) {
   if (!Array.isArray(sections)) return;
   const visible = new Set(sections.map(s => s.id));
   for (const [id, {section}] of originals) section.hidden = !visible.has(id);
-  main.querySelectorAll('.custom-section').forEach(section => section.remove());
+  const custom = new Map();
+  for (const section of main.querySelectorAll(':scope > .custom-section')) {
+    if (visible.has(section.id)) custom.set(section.id, section);
+    else section.remove();
+  }
+  let next = main.firstElementChild;
   for (const s of sections) {
     const original = originals.get(s.id);
-    let section = original?.section;
+    let section = original?.section || custom.get(s.id);
     if (!section) {
       section = node('section', null, 'section custom-section');
       section.id = s.id;
@@ -56,7 +62,9 @@ export function displaySections(sections) {
         button.setAttribute('aria-label', 'Ampliar: ' + img.alt);
       }
     }
-    main.append(section);
+    while (next?.hidden) next = next.nextElementSibling;
+    if (section === next) next = next.nextElementSibling;
+    else main.insertBefore(section, next);
   }
   document.querySelector('.logo').setAttribute('href', visible.has('inicio') ? '#inicio' : '#contenido');
   document.querySelectorAll('a[href^="#"]').forEach(link => {

@@ -1,5 +1,5 @@
 let catalog, page, selected = 'inicio';
-let product = null, selectedPhoto;
+let product = null, selectedPhoto, catalogRevision = 0;
 const frame = () => document.getElementById('pagePreview');
 const productFrame = () => document.getElementById('productPreview');
 function send(target, payload) {
@@ -7,9 +7,10 @@ function send(target, payload) {
 }
 function refresh(recenter = false) {
   if (!catalog || !page) return;
-  send(frame(), {...catalog, sections:page, focus:selected, photoKey:selectedPhoto, recenter:recenter === true});
+  send(frame(), {...catalog, catalogRevision, sections:page, focus:selected, photoKey:selectedPhoto, recenter:recenter === true});
 }
 export function previewCatalog(data) {
+  catalogRevision++;
   catalog = {products:data.products, categories:data.categories};
   refresh();
 }

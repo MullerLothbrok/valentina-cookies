@@ -127,49 +127,66 @@ async function photosForPublication() {
   }
   return result;
 }
+function createCard(s, openId) {
+  const card = node('details', null, 'card page-card');
+  card.open = s.id === openId;
+  card.ontoggle = () => { if (card.isConnected && card.open) previewSections(sections, s.id); };
+  const summary = node('summary');
+  const name = node('strong', s.title || 'Nueva sección');
+  const badge = node('small', s.visible ? '' : 'Oculta');
+  summary.append(name, badge);
+  const title = node('input'); title.value = s.title; title.maxLength = 160;
+  title.oninput = () => { s.title = title.value; name.textContent = s.title || 'Nueva sección'; changed(); };
+  const body = node('textarea'); body.rows = 3; body.maxLength = 4000; body.value = s.body;
+  body.oninput = () => { s.body = body.value; changed(); };
+  const visible = node('input'); visible.type = 'checkbox'; visible.checked = s.visible;
+  visible.onchange = () => { s.visible = visible.checked; badge.textContent = s.visible ? '' : 'Oculta'; changed(); };
+  const toggle = node('label', null, 'check'); toggle.append(visible, 'Mostrar en la tienda');
+  function move(offset) {
+    const index = sections.indexOf(s);
+    const neighbor = offset < 0 ? card.previousElementSibling : card.nextElementSibling;
+    if (!neighbor || index < 0) return;
+    sections.splice(index, 1); sections.splice(index + offset, 0, s);
+    card.parentElement.insertBefore(card, offset < 0 ? neighbor : neighbor.nextElementSibling);
+    updateMoveButtons(); focusCard(s.id); changed(s.id);
+  }
+  const controls = node('div', null, 'actions');
+  const up = button('Subir', () => move(-1));
+  const down = button('Bajar', () => move(1));
+  up.dataset.move = 'up'; down.dataset.move = 'down';
+  controls.append(up, down,
+    button('Quitar sección', () => {
+      if (!confirm('¿Quitar esta sección? El cambio se aplicará cuando publiques.')) return;
+      sections.splice(sections.indexOf(s), 1); card.remove();
+      updateMoveButtons(); updateRestoreMenu(); $('addSection').focus(); changed();
+    }));
+  card.dataset.id = s.id;
+  card.append(summary, field('Título', title), field('Texto', body), colorFields(s));
+  if (sectionPhotos[s.id]) card.append(photoFields(s));
+  if (s.id === 'catalogo') card.append(node('p', 'Para cambiar una foto del catálogo, entrá en Productos y tocá Fotos o Agregar foto.', 'muted'));
+  card.append(toggle, controls);
+  return card;
+}
+function updateMoveButtons() {
+  const cards = $('sectionList').children;
+  for (const card of cards) {
+    card.querySelector('[data-move="up"]').disabled = card === cards[0];
+    card.querySelector('[data-move="down"]').disabled = card === cards[cards.length - 1];
+  }
+}
 function draw(openId) {
   releasePhotos();
-  const list = $('sectionList');
-  list.replaceChildren();
-  for (const [index, s] of sections.entries()) {
-    const card = node('details', null, 'card page-card');
-    card.open = s.id === openId;
-    card.ontoggle = () => { if (card.open) previewSections(sections, s.id); };
-    const summary = node('summary');
-    const name = node('strong', s.title || 'Nueva sección');
-    const badge = node('small', s.visible ? '' : 'Oculta');
-    summary.append(name, badge);
-    const title = node('input'); title.value = s.title; title.maxLength = 160;
-    title.oninput = () => { s.title = title.value; name.textContent = s.title || 'Nueva sección'; changed(); };
-    const body = node('textarea'); body.rows = 3; body.maxLength = 4000; body.value = s.body;
-    body.oninput = () => { s.body = body.value; changed(); };
-    const visible = node('input'); visible.type = 'checkbox'; visible.checked = s.visible;
-    visible.onchange = () => { s.visible = visible.checked; badge.textContent = s.visible ? '' : 'Oculta'; changed(); };
-    const toggle = node('label', null, 'check'); toggle.append(visible, 'Mostrar en la tienda');
-    function move(offset) {
-      sections.splice(index, 1); sections.splice(index + offset, 0, s);
-      changed(); draw(s.id); focusCard(s.id);
-    }
-    const controls = node('div', null, 'actions');
-    controls.append(button('Subir', () => move(-1), index === 0), button('Bajar', () => move(1), index === sections.length - 1),
-      button('Quitar sección', () => {
-        if (!confirm('¿Quitar esta sección? El cambio se aplicará cuando publiques.')) return;
-        sections.splice(index, 1); changed(); draw(); $('addSection').focus();
-      }));
-    card.dataset.id = s.id;
-    card.append(summary, field('Título', title), field('Texto', body), colorFields(s));
-    if (sectionPhotos[s.id]) card.append(photoFields(s));
-    if (s.id === 'catalogo') card.append(node('p', 'Para cambiar una foto del catálogo, entrá en Productos y tocá Fotos o Agregar foto.', 'muted'));
-    card.append(toggle, controls);
-    list.append(card);
-  }
+  $('sectionList').replaceChildren(...sections.map(s => createCard(s, openId)));
+  updateMoveButtons(); updateRestoreMenu();
+  previewSections(sections, openId);
+}
+function updateRestoreMenu() {
   const select = $('restoreSection');
   select.replaceChildren(new Option('Recuperar sección original…', ''));
   for (const s of originals) {
     if (!sections.some(item => item.id === s.id)) select.add(new Option(s.title, s.id));
   }
   select.hidden = select.options.length <= 1;
-  previewSections(sections, openId);
 }
 function focusCard(id, selector = 'summary') {
   $('sectionList').querySelector('[data-id="' + id + '"] ' + selector)?.focus();
@@ -189,7 +206,8 @@ export function resetPageEditor() {
   draw(); status('');
 }
 function add(s) {
-  sections.push(s); changed(); draw(s.id); focusCard(s.id, 'input');
+  sections.push(s); $('sectionList').append(createCard(s, s.id));
+  updateMoveButtons(); updateRestoreMenu(); focusCard(s.id, 'input'); changed(s.id);
 }
 $('addSection').onclick = () => add({ id:crypto.randomUUID(), title:'', body:'', visible:true });
 $('restoreSection').onchange = e => {
@@ -208,7 +226,10 @@ $('discardPage').onclick = async () => {
 };
 $('publishPage').onclick = async () => {
   const missing = sections.find(s => !s.title.trim());
-  if (missing) { draw(missing.id); focusCard(missing.id, 'input'); status('Escribí un título para esta sección.'); return; }
+  if (missing) {
+    $('sectionList').querySelector('[data-id="' + missing.id + '"]').open = true;
+    focusCard(missing.id, 'input'); status('Escribí un título para esta sección.'); return;
+  }
   busy = true; status('Publicando…');
   try {
     const {page} = await request({action:'page', version:saved.version, sections:await photosForPublication()});

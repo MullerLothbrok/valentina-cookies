@@ -6,13 +6,16 @@ export const previewMode = window.parent !== window && new URLSearchParams(locat
 export function startPreview() {
   document.documentElement.classList.add('editor-preview');
   const main = document.getElementById('contenido');
-  let selected = '';
+  let selected = '', drawnRevision = null;
   window.addEventListener('message', event => {
     if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'valentina-preview') return;
     const {sections, products, categories, focus, photoKey, productOnly} = event.data;
     const scroll = window.scrollY;
     displaySections(sections.filter(s => s.visible));
-    drawCatalog(products, categories);
+    if (productOnly || drawnRevision !== event.data.catalogRevision) {
+      drawCatalog(products, categories);
+      drawnRevision = event.data.catalogRevision;
+    }
     document.getElementById('pageLoadStatus').hidden = true;
     main.hidden = false;
     document.documentElement.classList.toggle('product-preview', !!productOnly);

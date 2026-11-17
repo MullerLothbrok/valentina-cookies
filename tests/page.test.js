@@ -43,3 +43,18 @@ test('colors are local to each section, versioned, validated and resettable', ()
   assert.deepEqual(publish([{...existing, colors:{}}, custom])[1].colors, {text:'#ffffff'});
   assert.equal(pageFor(state).sections[0].colors, undefined);
 });
+test('adding and moving sections preserves all other sections and their photos', () => {
+  const state = {};
+  const photo = '/api/photo?id=' + randomUUID();
+  const originals = pageFor(state).sections.map(s => s.id === 'mundo'
+    ? {...s, photos:{rolls:photo}, colors:{background:'#482917'}}
+    : {...s, visible:s.id !== 'marca'});
+  const first = publishPage(state, {version:0, sections:originals});
+  const before = structuredClone(first.sections);
+  const extra = title => ({id:randomUUID(), title, body:'', visible:true});
+  const a = extra('Primer anuncio'), b = extra('Segundo anuncio');
+  publishPage(state, {version:1, sections:[...first.sections, a, b]});
+  const moved = publishPage(state, {version:2, sections:[b, ...first.sections, a]});
+  assert.deepEqual(moved.sections.slice(1, -1), before);
+  assert.deepEqual(moved.sections.map(s => s.id), [b.id, ...before.map(s => s.id), a.id]);
+});
