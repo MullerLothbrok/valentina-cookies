@@ -7,12 +7,14 @@ import { money } from '../order.js';
 const $ = id => document.getElementById(id);
 const edit = $('edit').elements;
 let data, draft;
+let productDirty = false, productBusy = false;
+const searchText = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 function note(message) {
   $('notice').textContent = message; $('notice').hidden = !message;
 }
 function showLogin() {
   document.body.classList.remove('content-editing');
-  resetPageEditor();
+  $('logout').hidden = true; resetPageEditor();
   data = null; $('dashboard').hidden = true; $('login').hidden = false;
   $('productList').replaceChildren(); $('orderList').replaceChildren();
 }
@@ -20,8 +22,8 @@ async function reload() {
   try {
     data = await request(null, '?view=admin');
     $('login').hidden = true; $('dashboard').hidden = false;
-    previewCatalog(data);
-    setCategoryProducts(data.products); loadCategories(data.categories, reload, note, placement => { tab('products'); openEditor(undefined, false, placement); }); renderProducts(); renderOrders(); loadPageEditor(data.page, data.originalSections);
+    $('logout').hidden = false; previewCatalog(data);
+    setCategoryProducts(data.products); loadCategories(data.categories, reload, note, placement => { tab('products'); $('productFilter').value = placement.categoryId; $('productSearch').value = ''; renderProducts(); openEditor(undefined, false, placement); }); renderProducts(); renderOrders(); loadPageEditor(data.page, data.originalSections);
   } catch (error) {
     if (error.status === 401) showLogin();
     throw error;
@@ -44,7 +46,9 @@ function renderProducts() {
   $('productFilter').value = selected;
   const filter = $('productFilter').value;
 
+  const query = searchText($('productSearch').value);
   for (const [id, p] of Object.entries(data.products)) {
+    if (query && !searchText(p.name).includes(query)) continue;
     if (filter && (p.categoryId || 'none') !== filter) continue;
     const row = node('article', null, 'row');
     if (p.photos[0]) {
@@ -55,9 +59,15 @@ function renderProducts() {
     info.append(node('h3', p.name), node('p', (p.price ? 'Gs. ' + money(p.price) : 'A consultar') + ' · ' + stock, 'muted'));
     const category = data.categories[p.categoryId];
     if (category) info.append(node('small', category.name + (category.groups[p.groupId] ? ' · ' + category.groups[p.groupId].name : '')));
-    row.append(info, action('Editar', () => openEditor(id), 'secondary'), action('Duplicar', () => openEditor(id, true), 'secondary')); list.append(row);
+    const controls = node('div', null, 'row-actions');
+    controls.append(action('Editar', () => openEditor(id)), action(p.photos.length ? 'Fotos' : 'Agregar foto', () => {
+      openEditor(id);
+      $('files').focus({preventScroll:true});
+      $('photoArea').scrollIntoView({block:'nearest'});
+    }, 'secondary'), action('Duplicar', () => openEditor(id, true), 'secondary'));
+    row.append(info, controls); list.append(row);
   }
-  if (!list.children.length) list.append(node('p', 'Todavía no hay productos.'));
+  if (!list.children.length) list.append(node('p', query || filter ? 'No hay productos que coincidan. Probá con otro nombre o categoría.' : 'Todavía no hay productos.'));
 }
 function renderOrders() {
   const list = $('orderList'); list.replaceChildren();
@@ -78,24 +88,40 @@ function renderOrders() {
   if (!list.children.length) list.append(node('p', 'No hay pedidos para mostrar.'));
 }
 function openEditor(id, duplicate = false, placement = {}) {
+  productDirty = false;
+  $('photoStatus').textContent = '';
   const p = id ? data.products[id] : { name:'', description:'', price:0, stock:null, available:true, photos:[], version:null, ...placement };
   draft = { ...structuredClone(p), id:duplicate ? crypto.randomUUID() : id || crypto.randomUUID() };
   if (duplicate) { draft.version = null; draft.name = p.name + ' · nueva presentación'; }
   edit.title.value = draft.name; edit.description.value = p.description; edit.price.value = p.price;
   edit.stock.value = p.stock ?? ''; edit.available.checked = p.available; $('files').value = '';
-  $('editError').textContent = ''; $('editTitle').textContent = duplicate ? 'Nueva presentación' : id ? 'Editar producto' : 'Agregar producto';
+  $('editError').textContent = ''; $('editTitle').textContent = duplicate || placement.groupId ? 'Nueva presentación' : id ? 'Editar producto' : 'Agregar producto';
   selectCategory(edit.category, edit.priceGroup, edit.price, p);
   $('delete').hidden = !id || duplicate;
-  $('productPreviewPanel').open = true; drawPhotos(); $('editor').showModal();
+  $('productPreviewPanel').open = false;
+  drawPhotos(); $('editor').showModal(); document.querySelector('.editor-body').scrollTop = 0;
 }
 function drawPhotos() {
   updateProductPreview();
   const area = $('photos'); area.replaceChildren();
+  syncPhotoCount();
   draft.photos.forEach((photo, i) => {
     const box = node('div'); const img = node('img');
     img.src = photo.startsWith('data:') ? photo : new URL(photo, location.origin); img.alt = 'Foto ' + (i + 1);
-    box.append(img, action('Quitar', () => { draft.photos.splice(i, 1); drawPhotos(); }, 'secondary')); area.append(box);
+    box.append(img);
+    if (i === 0) box.append(node('strong', 'Portada', 'cover-badge'));
+    else box.append(action('Usar de portada', () => {
+      draft.photos.unshift(...draft.photos.splice(i, 1)); productDirty = true; drawPhotos();
+    }, 'secondary'));
+    box.append(action('Quitar', () => {
+      draft.photos.splice(i, 1); productDirty = true; drawPhotos();
+    }, 'secondary'));
+    area.append(box);
   });
+}
+function syncPhotoCount() {
+  $('photoCount').textContent = draft.photos.length + ' de 6 fotos';
+  $('files').disabled = draft.photos.length >= 6 || productBusy;
 }
 async function resize(file) {
   const img = new Image(); const url = URL.createObjectURL(file);
@@ -110,37 +136,65 @@ async function resize(file) {
 $('files').onchange = async () => {
   const files = [...$('files').files];
   $('editError').textContent = '';
-  $('save').disabled = true;
+  if (!files.length || productBusy) return;
+  setProductBusy(true, 'Preparando fotos…');
   try {
-    if (draft.photos.length + files.length > 6) throw Error('Elegí hasta seis fotos en total.');
+    if (draft.photos.length + files.length > 6) throw Error('Podés tener hasta 6 fotos. Elegí menos o quitá una antes de continuar.');
     const photos = [];
-    for (const file of files) photos.push(await resize(file));
-    draft.photos.push(...photos); drawPhotos();
-  } catch (e) { $('editError').textContent = e.message || 'No pudimos abrir esa foto.'; }
-  finally { $('files').value = ''; $('save').disabled = false; }
+    for (const [index, file] of files.entries()) {
+      $('photoStatus').textContent = 'Preparando foto ' + (index + 1) + ' de ' + files.length + '…';
+      try { photos.push(await resize(file)); }
+      catch { throw Error('No pudimos abrir «' + file.name + '». Probá con una imagen JPG, PNG o WebP.'); }
+    }
+    draft.photos.push(...photos); productDirty = true; drawPhotos();
+    $('photoStatus').textContent = 'Fotos listas. Tocá Guardar producto para publicarlas.';
+  } catch (e) { $('photoStatus').textContent = e.message; }
+  finally { $('files').value = ''; setProductBusy(false); }
 };
+function setProductBusy(busy, label = 'Guardar producto') {
+  productBusy = busy; $('productFields').disabled = busy;
+  $('save').disabled = busy; $('close').disabled = busy;
+  $('save').textContent = label; syncPhotoCount();
+}
 async function save(remove) {
-  $('save').disabled = true; $('delete').disabled = true; $('close').disabled = true; $('files').disabled = true;
+  if (productBusy) return;
+  setProductBusy(true, remove ? 'Eliminando…' : 'Guardando…');
+  $('editError').textContent = '';
   try {
     if (!remove) {
       Object.assign(draft, { name:edit.title.value, description:edit.description.value, price:Number(edit.price.value),
         categoryId:edit.category.value, groupId:edit.priceGroup.value, stock:edit.stock.value === '' ? null : Number(edit.stock.value), available:edit.available.checked });
+      const uploads = draft.photos.filter(src => src.startsWith('data:')).length;
+      let uploaded = 0;
       for (let i = 0; i < draft.photos.length; i++) {
         const src = draft.photos[i];
-        if (src.startsWith('data:')) draft.photos[i] = (await request({action:'upload', image:src.split(',')[1]})).photo;
+        if (src.startsWith('data:')) {
+          $('save').textContent = 'Subiendo foto ' + (++uploaded) + ' de ' + uploads + '…';
+          draft.photos[i] = (await request({action:'upload', image:src.split(',')[1]})).photo;
+        }
       }
     }
     await request({ action:remove ? 'delete' : 'product', product:draft });
-    $('editor').close(); await reload(); note(remove ? 'Producto eliminado.' : 'Producto guardado.');
+    productDirty = false; $('editor').close(); await reload(); note(remove ? 'Producto eliminado.' : 'Producto guardado.');
   } catch (e) {
     $('editError').textContent = e.message;
     if (!$('editor').open) note(e.message);
     if (e.status === 409) await reload().catch(err => note(err.message));
-  } finally { $('save').disabled = false; $('delete').disabled = false; $('close').disabled = false; $('files').disabled = false; }
+  } finally { setProductBusy(false); }
 }
 $('edit').onsubmit = e => { e.preventDefault(); save(false); };
 $('delete').onclick = () => { if (confirm('¿Eliminar ' + draft.name + ' del catálogo?')) save(true); };
-$('add').onclick = () => openEditor(); $('close').onclick = () => $('editor').close();
+$('add').onclick = () => openEditor(undefined, false, {categoryId:data.categories[$('productFilter').value] ? $('productFilter').value : ''});
+function closeProduct() {
+  if (!productBusy && (!productDirty || confirm('¿Salir sin guardar los cambios del producto?'))) {
+    productDirty = false; $('editor').close();
+  }
+}
+$('close').onclick = closeProduct;
+$('editor').oncancel = event => { event.preventDefault(); closeProduct(); };
+window.addEventListener('beforeunload', event => {
+  if ($('editor').open && (productDirty || productBusy)) { event.preventDefault(); event.returnValue = ''; }
+});
 $('login').onsubmit = async e => {
   e.preventDefault();
   try { await request({action:'login',password:$('login').elements.password.value}); $('login').reset(); await reload(); note(''); }
@@ -148,6 +202,7 @@ $('login').onsubmit = async e => {
 };
 $('logout').onclick = async () => { try { await request({action:'logout'}); showLogin(); note(''); } catch(e) { note(e.message); } };
 $('productFilter').onchange = renderProducts;
+$('productSearch').oninput = renderProducts;
 $('filter').onchange = renderOrders; $('refresh').onclick = () => reload().then(() => note('Lista actualizada.')).catch(e => note(e.message));
 function tab(active) {
   document.body.classList.toggle('content-editing', active === 'content');
@@ -166,5 +221,7 @@ function updateProductPreview() {
     stock:edit.stock.value === '' ? null : Number(edit.stock.value), available:edit.available.checked,
     categoryId:edit.category.value, groupId:edit.priceGroup.value});
 }
-$('edit').addEventListener('input', updateProductPreview);
+$('edit').addEventListener('input', event => {
+  if (event.target !== $('files')) { productDirty = true; updateProductPreview(); }
+});
 $('edit').addEventListener('change', updateProductPreview);

@@ -1,86 +1,110 @@
 import { request, node } from '../shop-client.js';
 import { money } from '../order.js';
 
+const $ = id => document.getElementById(id);
 let categories = {};
+let catalogProducts = {};
+let editing, refresh, announce, addPresentation;
+let expanded = new Set();
+let busy = false;
+export function setCategoryProducts(products) { catalogProducts = products; }
+
+function button(label, click, style = 'secondary') {
+  const el = node('button', label, style);
+  el.type = 'button';
+  el.onclick = click;
+  return el;
+}
+function openForm(categoryId, groupId, isPrice = false) {
+  const category = categories[categoryId];
+  const item = isPrice ? category?.groups[groupId] : category;
+  editing = { categoryId, groupId, isPrice, version:item?.version ?? null };
+  $('categoryHeading').textContent = isPrice ? (item ? 'Editar precio compartido' : 'Agregar precio compartido') : (item ? 'Editar categoría' : 'Agregar categoría');
+  $('categoryLabel').textContent = isPrice ? 'Nombre del grupo' : 'Nombre de categoría';
+  $('categoryName').placeholder = isPrice ? 'Ej. Cookies rellenas' : 'Ej. Cookies';
+  $('categoryName').value = item?.name ?? '';
+  $('categoryPriceField').hidden = !isPrice;
+  $('categoryPrice').disabled = !isPrice;
+  $('categoryPrice').value = isPrice ? (item?.price ?? '') : '';
+  const count = Object.values(catalogProducts).filter(p => p.categoryId === categoryId && p.groupId === groupId).length;
+  $('categoryHint').textContent = isPrice ? category.name + ' · ' + (item ? 'Al guardar, este precio se aplica a ' + count + (count === 1 ? ' producto.' : ' productos.') : 'Usá el mismo precio para varias presentaciones.') : '';
+  $('categorySave').textContent = item ? 'Guardar cambios' : (isPrice ? 'Crear precio compartido' : 'Crear categoría');
+  $('categoryDelete').hidden = !item;
+  $('categoryDelete').textContent = isPrice ? 'Quitar precio compartido' : 'Eliminar categoría';
+  $('categoryError').textContent = '';
+  $('categoryEditor').showModal();
+}
+function categoryDirty() {
+  const {categoryId, groupId, isPrice} = editing;
+  const item = isPrice ? categories[categoryId]?.groups[groupId] : categories[categoryId];
+  return $('categoryName').value !== (item?.name ?? '') ||
+    (isPrice && $('categoryPrice').value !== String(item?.price ?? ''));
+}
+function closeForm() {
+  if (!busy && (!categoryDirty() || confirm('¿Salir sin guardar estos cambios?'))) $('categoryEditor').close();
+}
+$('closeCategory').onclick = closeForm;
+$('categoryEditor').oncancel = event => { event.preventDefault(); closeForm(); };
+$('categoryForm').onsubmit = event => { event.preventDefault(); persist(false); };
+$('categoryDelete').onclick = () => {
+  const question = editing.isPrice ? '¿Quitar este precio compartido? Cada producto conservará su precio actual.' : '¿Eliminar esta categoría? Sus productos conservarán su precio y aparecerán en «Sin categoría».';
+  if (confirm(question)) persist(true);
+};
+async function persist(remove) {
+  if (busy) return;
+  const {categoryId, groupId, isPrice, version} = editing;
+  const id = (isPrice ? groupId : categoryId) || crypto.randomUUID();
+  const item = {id, version, name:$('categoryName').value, remove};
+  if (isPrice) Object.assign(item, {categoryId, price:Number($('categoryPrice').value)});
+  busy = true; $('categoryFields').disabled = true;
+  try {
+    await request({action:isPrice ? 'priceGroup' : 'category', item});
+    const parentId = isPrice ? categoryId : id;
+    expanded.add(parentId);
+    $('categoryEditor').close();
+    await refresh();
+    const target = $(isPrice && !remove ? 'group-edit-' + id : 'category-open-' + parentId) || $('addCategory');
+    target.focus({preventScroll:true});
+    target.scrollIntoView({block:'nearest'});
+    announce(remove ? 'Cambio guardado.' : (isPrice ? 'Precio compartido guardado.' : 'Categoría guardada.'));
+  } catch (e) {
+    if ($('categoryEditor').open) $('categoryError').textContent = e.message;
+    else announce(e.message);
+  } finally { busy = false; $('categoryFields').disabled = false; }
+}
 export function loadCategories(value, reload, note, addProduct) {
-  categories = value;
-  const list = document.getElementById('categoryList');
+  categories = value; refresh = reload; announce = note; addPresentation = addProduct;
+  const list = $('categoryList');
   list.replaceChildren();
-  async function send(action, item) {
-    await request({action, item}); await reload(); note('Categorías y precios actualizados.');
-  }
-  function removeButton(label, action, item, question) {
-    const button = node('button', label, 'secondary'); button.type = 'button';
-    button.onclick = async () => {
-      if (!confirm(question)) return;
-      button.disabled = true;
-      try { await send(action, {...item, remove:true}); } catch (e) { note(e.message); } finally { button.disabled = false; }
-    };
-    return button;
-  }
   for (const [id, category] of Object.entries(categories)) {
-    const card = node('section', null, 'card');
-    card.append(node('h3', category.name));
-    const form = namedForm('Nombre de categoría', category.name, 'Guardar nombre');
-    form.onsubmit = event => submit(event, form, () => send('category', {id, version:category.version, name:form.elements.title.value}), note);
-    card.append(form);
-    for (const [groupId, group] of Object.entries(category.groups)) {
-      const groupForm = priceForm(group.name, group.price, 'Guardar precio');
-      groupForm.append(removeButton('Quitar grupo', 'priceGroup', {categoryId:id, id:groupId, version:group.version},
-        '¿Quitar este grupo? Sus productos conservarán su precio y pasarán a tener precio individual.'));
-      groupForm.onsubmit = event => submit(event, groupForm, () => send('priceGroup', {
-        categoryId:id, id:groupId, version:group.version, name:groupForm.elements.title.value, price:Number(groupForm.elements.price.value)
-      }), note);
-      const count = Object.values(categoryProducts).filter(p => p.categoryId === id && p.groupId === groupId).length;
-      groupForm.append(node('small', count + ' productos usan este precio.'));
-      const add = node('button', 'Agregar presentación', 'secondary'); add.type = 'button';
-      add.onclick = () => addProduct({categoryId:id, groupId});
-      groupForm.append(add);
-      card.append(groupForm);
+    const card = node('details', null, 'card category-card');
+    const groups = Object.entries(category.groups);
+    const summary = node('summary');
+    summary.id = 'category-open-' + id;
+    summary.append(node('strong', category.name), node('small', groups.length === 1 ? '1 precio compartido' : groups.length + ' precios compartidos'));
+    card.open = expanded.has(id);
+    card.ontoggle = () => {
+      if (!card.isConnected) return;
+      if (card.open) expanded.add(id); else expanded.delete(id);
+    };
+    const actions = node('div', null, 'actions');
+    actions.append(button('Agregar precio compartido', () => openForm(id, null, true), ''), button('Editar categoría', () => openForm(id)));
+    card.append(summary, actions);
+    for (const [groupId, group] of groups) {
+      const count = Object.values(catalogProducts).filter(p => p.categoryId === id && p.groupId === groupId).length;
+      const row = node('div', null, 'price-row');
+      const info = node('div', null, 'info');
+      info.append(node('strong', group.name), node('small', (group.price ? 'Gs. ' + money(group.price) : 'A consultar') + ' · ' + count + (count === 1 ? ' producto' : ' productos')));
+      const controls = node('div', null, 'actions');
+      const edit = button('Editar precio', () => openForm(id, groupId, true));
+      edit.id = 'group-edit-' + groupId;
+      controls.append(button('Agregar presentación', () => addPresentation({categoryId:id, groupId})), edit);
+      row.append(info, controls); card.append(row);
     }
-    const add = priceForm('', '', 'Agregar grupo de precio');
-    add.onsubmit = event => submit(event, add, () => send('priceGroup', {
-      categoryId:id, id:crypto.randomUUID(), version:null, name:add.elements.title.value, price:Number(add.elements.price.value)
-    }), note);
-    card.append(add, removeButton('Eliminar categoría', 'category', {id, version:category.version},
-      '¿Eliminar esta categoría? Sus productos conservarán su precio y aparecerán como Sin categoría.'));
     list.append(card);
   }
   if (!list.children.length) list.append(node('p', 'Agregá una categoría para empezar a organizar tus productos.'));
-  document.getElementById('addCategory').onclick = () => {
-    const dialog = document.getElementById('categoryEditor');
-    document.getElementById('categoryName').value = '';
-    document.getElementById('categoryError').textContent = '';
-    dialog.showModal();
-  };
-  document.getElementById('closeCategory').onclick = () => document.getElementById('categoryEditor').close();
-  const form = document.getElementById('categoryForm');
-  form.onsubmit = event => submit(event, form, async () => {
-    await send('category', {id:crypto.randomUUID(), version:null, name:document.getElementById('categoryName').value});
-    document.getElementById('categoryEditor').close();
-  }, message => { document.getElementById('categoryError').textContent = message; });
-}
-let categoryProducts = {};
-export function setCategoryProducts(products) { categoryProducts = products; }
-function namedForm(label, value, buttonText) {
-  const form = node('form', null, 'category-form');
-  const input = node('input'); input.name = 'title'; input.maxLength = 100; input.required = true; input.value = value;
-  const wrapper = node('label', label); wrapper.append(input);
-  const button = node('button', buttonText); form.append(wrapper, button);
-  return form;
-}
-function priceForm(name, price, label) {
-  const form = namedForm('Nombre del grupo', name, label);
-  const field = node('label', 'Precio del grupo en guaraníes');
-  const input = node('input'); input.name = 'price'; input.type = 'number'; input.min = 0; input.max = 999999999; input.step = 1; input.required = true; input.value = price;
-  field.append(input); form.insertBefore(field, form.lastChild);
-  return form;
-}
-async function submit(event, form, send, note) {
-  event.preventDefault();
-  const buttons = [...form.querySelectorAll('button')];
-  buttons.forEach(b => { b.disabled = true; });
-  try { await send(); } catch (e) { note(e.message); } finally { buttons.forEach(b => { b.disabled = false; }); }
+  $('addCategory').onclick = () => openForm();
 }
 export function selectCategory(categorySelect, groupSelect, priceInput, product) {
   categorySelect.replaceChildren(new Option('Sin categoría', ''));
@@ -99,6 +123,9 @@ export function selectCategory(categorySelect, groupSelect, priceInput, product)
     const group = categories[categorySelect.value]?.groups[groupSelect.value];
     priceInput.readOnly = !!group;
     if (group) priceInput.value = group.price;
+    document.getElementById('priceHint').textContent = group
+      ? 'Precio compartido. Podés cambiarlo para todo el grupo en Categorías y precios.'
+      : 'Escribí 0 para cotizar por WhatsApp.';
   }
   groups(product.groupId || '');
   categorySelect.onchange = () => groups('');

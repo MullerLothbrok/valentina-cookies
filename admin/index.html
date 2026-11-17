@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>Administrar tienda · Valentina</title>
-<link rel="icon" type="image/png" href="/assets/brand/inicial-v.png"><link rel="stylesheet" href="/admin/panel.css?v=marca1"></head>
-<body><header><a href="/" class="brand" aria-label="Ana Valentina · Tienda"><img src="/assets/brand/ana-valentina.png" width="360" height="274" alt="Ana Valentina"></a><a href="/">Ver tienda ↗</a></header>
+<link rel="icon" type="image/png" href="/assets/brand/inicial-v.png"><link rel="stylesheet" href="/admin/panel.css?v=panel-movil"></head>
+<body><header><a href="/" class="brand" aria-label="Ana Valentina · Tienda"><img src="/assets/brand/ana-valentina.png" width="360" height="274" alt="Ana Valentina"></a><div class="header-links"><a href="/">Ver tienda ↗</a><button id="logout" class="secondary" hidden>Salir</button></div></header>
 <main><h1>Administrar tienda</h1><p id="notice" class="notice" role="status" hidden></p>
 <form id="login" class="card login" hidden><label>Clave del panel<input name="password" type="password" autocomplete="current-password" required></label><button>Ingresar</button></form>
-<section id="dashboard" hidden><nav aria-label="Gestión"><button id="productsTab" aria-pressed="true">Productos</button><button id="ordersTab" aria-pressed="false">Pedidos nacionales</button><button id="categoriesTab" aria-pressed="false">Categorías y precios</button><button id="contentTab" aria-pressed="false">Contenido de la página</button><button id="logout" class="secondary">Salir</button></nav>
-<section id="products"><div class="heading"><h2>Productos</h2><button id="add">Agregar producto</button></div><label class="filter">Categoría<select id="productFilter"><option value="">Todas</option></select></label><div id="productList" class="list"></div></section>
+<section id="dashboard" hidden><nav aria-label="Gestión"><button id="productsTab" aria-pressed="true">Productos</button><button id="ordersTab" aria-pressed="false">Pedidos nacionales</button><button id="categoriesTab" aria-pressed="false">Categorías y precios</button><button id="contentTab" aria-pressed="false">Contenido de la página</button></nav>
+<section id="products"><div class="heading"><h2>Productos</h2><button id="add">Agregar producto</button></div><div class="product-tools"><label>Buscar producto<input type="search" id="productSearch" placeholder="Nombre del producto"></label><label>Categoría<select id="productFilter"><option value="">Todas</option></select></label></div><div id="productList" class="list"></div></section>
 <section id="categories" hidden><div class="heading"><h2>Categorías y precios</h2><button type="button" id="addCategory">Agregar categoría</button></div>
-<p>Creá grupos de precio dentro de cada categoría. Al cambiar un precio, se actualizan todos los productos de ese grupo.</p>
+<p>Abrí una categoría para agregar una presentación o cambiar el precio de varias a la vez.</p>
 <div id="categoryList" class="list"></div></section>
 <section id="orders" hidden><div class="heading"><h2>Pedidos nacionales</h2><button class="secondary" id="refresh">Actualizar</button></div>
 <label class="filter">Estado<select id="filter"><option value="">Todos</option><option value="pendiente">Pendientes</option><option value="confirmado">Confirmados</option><option value="enviado">Enviados</option><option value="cancelado">Cancelados</option></select></label><div id="orderList" class="list"></div></section>
@@ -25,14 +25,26 @@
 </aside></div><div class="page-actions"><button type="button" id="showPreview" class="secondary">Ver vista previa</button><span id="pageStatus" role="status"></span>
 <button type="button" id="publishPage" disabled>Publicar cambios</button><button type="button" class="secondary" id="discardPage" disabled>Descartar cambios</button></div></section>
 </section></main>
-<dialog id="categoryEditor"><form id="categoryForm"><h2>Agregar categoría</h2><label>Nombre de categoría<input id="categoryName" maxlength="100" required></label><p id="categoryError" role="alert"></p><div class="actions"><button>Crear categoría</button><button type="button" class="secondary" id="closeCategory">Cerrar</button></div></form></dialog>
-<dialog id="editor"><form id="edit"><div class="heading"><h2 id="editTitle">Editar producto</h2><button type="button" class="secondary" id="close">Cerrar</button></div>
+<dialog id="categoryEditor" aria-labelledby="categoryHeading"><form id="categoryForm"><fieldset id="categoryFields">
+<h2 id="categoryHeading">Agregar categoría</h2><p id="categoryHint" class="muted"></p>
+<label><span id="categoryLabel">Nombre de categoría</span><input id="categoryName" maxlength="100" required></label>
+<label id="categoryPriceField" hidden>Precio en guaraníes<input id="categoryPrice" type="number" inputmode="numeric" min="0" max="999999999" step="1" required><small>Escribí 0 para cotizar por WhatsApp.</small></label>
+<p id="categoryError" role="alert"></p><div class="actions"><button id="categorySave">Crear categoría</button><button type="button" class="secondary" id="closeCategory">Cancelar</button></div>
+<button type="button" class="danger remove-item" id="categoryDelete" hidden>Eliminar categoría</button>
+</fieldset></form></dialog>
+<dialog id="editor" aria-labelledby="editTitle"><form id="edit"><div class="heading editor-heading"><h2 id="editTitle">Editar producto</h2><button type="button" class="secondary" id="close">Cerrar</button></div>
+<div class="editor-body"><fieldset id="productFields">
 <label>Nombre<input name="title" maxlength="100" required></label>
+<label>Descripción<textarea name="description" rows="2" maxlength="600"></textarea></label>
+<section id="photoArea" aria-labelledby="photoHeading"><h3 id="photoHeading">Fotos del producto</h3>
+<p id="photoHint" class="muted">La portada es la foto que se ve en el catálogo.</p>
+<div id="photos"></div><label class="pick-photo"><span>Agregar fotos</span><input id="files" type="file" multiple accept="image/*" aria-label="Agregar fotos" aria-describedby="photoHint"></label>
+<small id="photoCount"></small><p id="photoStatus" role="status"></p></section>
 <div class="pair"><label>Categoría<select name="category"></select></label><label>Grupo de precio<select name="priceGroup"></select></label></div>
-<label>Descripción<textarea name="description" rows="3" maxlength="600"></textarea></label>
-<div class="pair"><label>Precio en guaraníes<input type="number" name="price" min="0" max="999999999" step="1" required><small>0 para cotizar por WhatsApp.</small></label>
-<label>Unidades disponibles<input type="number" name="stock" min="0" max="999999" step="1"><small>Dejá vacío para vender por encargo.</small></label></div>
+<div class="pair"><label>Precio en guaraníes<input type="number" inputmode="numeric" name="price" min="0" max="999999999" step="1" required><small id="priceHint"></small></label>
+<label>Unidades disponibles<input type="number" inputmode="numeric" name="stock" min="0" max="999999" step="1"><small>Dejá vacío para vender por encargo.</small></label></div>
 <label class="check"><input type="checkbox" name="available">Disponible para pedidos</label>
-<label>Fotos<input id="files" type="file" multiple accept="image/*"><small>Hasta 6 fotos. La primera aparece en el catálogo.</small></label><div id="photos"></div>
-<details id="productPreviewPanel"><summary>Ver cómo queda en el catálogo</summary><iframe id="productPreview" title="Vista previa del producto" src="/?preview=editor" sandbox="allow-scripts allow-same-origin"></iframe></details><p id="editError" role="alert"></p><div class="heading"><button id="save">Guardar producto</button><button id="delete" type="button" class="danger">Eliminar producto</button></div>
+<details id="productPreviewPanel"><summary>Ver cómo queda en el catálogo</summary><iframe id="productPreview" title="Vista previa del producto" src="/?preview=editor" sandbox="allow-scripts allow-same-origin"></iframe></details>
+<button id="delete" type="button" class="danger remove-item">Eliminar producto</button>
+</fieldset></div><div class="editor-footer"><p id="editError" role="alert"></p><button id="save">Guardar producto</button></div>
 </form></dialog><script type="module" src="/admin/panel.js"></script></body></html>

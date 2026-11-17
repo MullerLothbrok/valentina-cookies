@@ -49,6 +49,10 @@ document.getElementById('closePreview').onclick = () => pane.classList.remove('m
 document.getElementById('previewSize').onchange = event => {
   pane.classList.toggle('preview-phone', event.target.value === 'phone');
 };
+if (matchMedia('(max-width: 650px)').matches) {
+  pane.classList.add('preview-phone');
+  document.getElementById('previewSize').value = 'phone';
+}
 frame().addEventListener('load', refresh);
 productFrame().addEventListener('load', () => previewProduct(product));
 
