@@ -1,3 +1,4 @@
+import { applySectionColors } from './section-colors.js';
 import { sectionPhotos } from './section-photos.js';
 import { node } from './shop-client.js';
 
@@ -36,6 +37,7 @@ export function displaySections(sections) {
       title.dataset.pageTitle = ''; body.dataset.pageBody = '';
       section.append(title, body);
     }
+    applySectionColors(section, s);
     setCopy(section.querySelector('[data-page-title]'), s.title, original?.title);
     setCopy(section.querySelector('[data-page-body]'), s.body, original?.body);
     for (const photo of original?.photos || []) {

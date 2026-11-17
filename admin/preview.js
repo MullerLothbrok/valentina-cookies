@@ -21,7 +21,7 @@ export function previewSections(sections, focus, photoKey) {
 export function previewProduct(draft) {
   product = draft;
   if (!catalog || !draft) return;
-  const description = {id:'catalogo', title:draft.name || 'Nueva presentación', body:'', visible:true};
+  const description = {id:'catalogo', colors:page?.find(s => s.id === 'catalogo')?.colors, title:draft.name || 'Nueva presentación', body:'', visible:true};
   send(productFrame(), {products:{[draft.id]:draft}, categories:catalog.categories, sections:[description], focus:'catalogo', productOnly:true});
 }
 window.addEventListener('message', event => {

@@ -98,3 +98,10 @@ button,select,.page-card summary,#productPreviewPanel summary{min-height:44px}
 .section-photo strong,.section-photo small{display:block}
 .section-photo .pick-photo,.section-photo button{font-size:.9rem}
 .section-photo small[role=alert]{color:#941e35}
+.section-colors{min-width:0;margin:1rem 0;padding:.65rem .8rem .75rem;border:1px solid #ded8cd;border-radius:10px}
+.section-colors legend{font-weight:700;padding:0 .3rem}
+.color-fields{display:flex;gap:.8rem}
+.color-fields label{flex:1;margin:0}
+.color-fields input{width:100%;height:44px;padding:.2rem;cursor:pointer}
+.section-colors small:not(:empty){display:block;margin-top:.6rem}
+.section-colors button{margin-top:.6rem}

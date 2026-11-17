@@ -285,3 +285,23 @@ footer{padding-right:170px}
 .product-preview .catalog .head,.product-preview .catalog .note,.product-preview .category-title{display:none}
 .product-preview .catalog-category-items{grid-template-columns:1fr}
 .product-preview #contenido section{outline:0}
+/* Apply a section's palette to its reading surfaces. Controls keep their own states. */
+.section-background,
+.section-background :is(.hero-copy,.brand-copy,.builder-intro,.builder-card,.builder-result,.occasion,.item,.process-step) {
+  background-color:var(--section-background);
+}
+.section-ink,
+.section-ink :is(.builder-intro,.builder-intro p,.feature-copy p,.corporate-strip div,.head p,.note,.occasion p,.process-step p,.item p,.builder-result small),
+.section-ink :is([data-page-title],[data-page-body]) :is(span,b,em) {
+  color:var(--section-text);
+}
+.section-ink .hot{-webkit-text-stroke:0;text-shadow:none}
+.section-ink .category-overlay{
+  color:var(--section-text);
+  background:linear-gradient(transparent,color-mix(in srgb,var(--letter-backing) 95%,transparent) 55%);
+}
+.section-ink .category-overlay p{color:inherit}
+.section-ink :is(.sticker,.pill,.process-num,.choice label){color:var(--ink)}
+.section-ink .shot-label{color:var(--section-text);background:var(--letter-backing)}
+.section-ink :is(.brand-tag,.hero-proof span){background:transparent;border-color:currentColor}
+.section-ink .corporate-strip div{border-color:currentColor}

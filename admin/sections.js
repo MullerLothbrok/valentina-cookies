@@ -1,3 +1,4 @@
+import { originalBackground, sectionText, luminance } from '../section-colors.js';
 import { sectionPhotos } from '../section-photos.js';
 import { preparePhoto, photoDataURL } from './photo-file.js';
 import { previewSections } from './preview.js';
@@ -33,6 +34,39 @@ function button(label, fn, disabled = false) {
 function field(label, element) {
   const wrapper = node('label', label);
   wrapper.append(element); return wrapper;
+}
+function colorFields(s) {
+  const group = node('fieldset', null, 'section-colors');
+  group.append(node('legend', 'Colores de la sección'));
+  const fields = node('div', null, 'color-fields');
+  const pickers = {};
+  const warning = node('small');
+  warning.setAttribute('role', 'status');
+  const restore = button('Restaurar colores originales', () => {
+    s.colors = {}; update(); changed(s.id);
+  });
+  function update() {
+    const background = s.colors?.background || originalBackground(s.id);
+    const text = sectionText(s);
+    pickers.text.value = text;
+    pickers.background.value = background;
+    restore.hidden = !(s.colors?.background || s.colors?.text);
+    const originalPanel = !s.colors?.background && s.id === 'arma-tu-box' ? '#100e0b' : background;
+    const light = luminance(originalPanel), ink = luminance(text);
+    warning.textContent = s.colors?.text && (Math.max(light, ink) + .05) / (Math.min(light, ink) + .05) < 4.5
+      ? 'El texto puede ser difícil de leer. Probá un tono más claro o más oscuro.' : '';
+  }
+  for (const [key, label] of [['background','Fondo'], ['text','Letras']]) {
+    const input = node('input'); input.type = 'color';
+    input.setAttribute('list', 'brandColors'); pickers[key] = input;
+    input.oninput = input.onchange = () => {
+      if (s.colors?.[key] === input.value) return;
+      (s.colors ??= {})[key] = input.value; update(); changed(s.id);
+    };
+    fields.append(field(label, input));
+  }
+  group.append(fields, warning, restore); update();
+  return group;
 }
 function photoFields(s) {
   const group = node('div', null, 'section-photos');
@@ -77,6 +111,7 @@ function photoFields(s) {
 async function photosForPublication() {
   const result = structuredClone(sections);
   for (const s of result) {
+    s.colors ??= {};
     if (!sectionPhotos[s.id]) continue;
     s.photos ??= {};
     for (const [key, url] of Object.entries(s.photos)) {
@@ -122,7 +157,7 @@ function draw(openId) {
         sections.splice(index, 1); changed(); draw(); $('addSection').focus();
       }));
     card.dataset.id = s.id;
-    card.append(summary, field('Título', title), field('Texto', body));
+    card.append(summary, field('Título', title), field('Texto', body), colorFields(s));
     if (sectionPhotos[s.id]) card.append(photoFields(s));
     if (s.id === 'catalogo') card.append(node('p', 'Para cambiar una foto del catálogo, entrá en Productos y tocá Fotos o Agregar foto.', 'muted'));
     card.append(toggle, controls);

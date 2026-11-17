@@ -27,3 +27,19 @@ test('section photos survive older editors, reject invalid sources and restore d
   assert.throws(() => publish({...original, photos:{rolls:'otra-url'}}), /foto/);
   assert.equal(publish({...original, photos:{}}).photos, undefined);
 });
+test('colors are local to each section, versioned, validated and resettable', () => {
+  const state = {};
+  const existing = pageFor(state).sections.find(s => s.id === 'mundo');
+  const custom = { id:randomUUID(), title:'Novedades', body:'Ediciones especiales', visible:true };
+  const publish = items => publishPage(state, {version:pageFor(state).version,sections:items}).sections;
+  const colors = { background:'#143526', text:'#ffffff' };
+  const [first, second] = publish([{...existing, colors}, custom]);
+  assert.deepEqual(first.colors, colors);
+  assert.equal(second.colors, undefined);
+  assert.deepEqual(publish([existing, {...custom, colors:{text:'#ffffff'}}])[0].colors, colors);
+  for (const invalid of [[], null, {text:'red'}, {background:'url(x)'}, {other:'#000000'}]) {
+    assert.throws(() => publish([{...existing, colors:invalid}]), /color/);
+  }
+  assert.deepEqual(publish([{...existing, colors:{}}, custom])[1].colors, {text:'#ffffff'});
+  assert.equal(pageFor(state).sections[0].colors, undefined);
+});
