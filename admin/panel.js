@@ -1,3 +1,4 @@
+import { preparePhoto, photoDataURL } from './photo-file.js';
 import { previewCatalog, previewProduct } from './preview.js';
 import { request, node } from '../shop-client.js';
 import { loadPageEditor, resetPageEditor } from './sections.js';
@@ -123,16 +124,6 @@ function syncPhotoCount() {
   $('photoCount').textContent = draft.photos.length + ' de 6 fotos';
   $('files').disabled = draft.photos.length >= 6 || productBusy;
 }
-async function resize(file) {
-  const img = new Image(); const url = URL.createObjectURL(file);
-  try {
-    img.src = url; await img.decode();
-    const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
-    const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(img.naturalWidth * scale)); canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
-    const ctx = canvas.getContext('2d'); ctx.fillStyle = 'white'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL('image/jpeg', .84);
-  } finally { URL.revokeObjectURL(url); }
-}
 $('files').onchange = async () => {
   const files = [...$('files').files];
   $('editError').textContent = '';
@@ -143,7 +134,7 @@ $('files').onchange = async () => {
     const photos = [];
     for (const [index, file] of files.entries()) {
       $('photoStatus').textContent = 'Preparando foto ' + (index + 1) + ' de ' + files.length + '…';
-      try { photos.push(await resize(file)); }
+      try { photos.push(await photoDataURL(await preparePhoto(file))); }
       catch { throw Error('No pudimos abrir «' + file.name + '». Probá con una imagen JPG, PNG o WebP.'); }
     }
     draft.photos.push(...photos); productDirty = true; drawPhotos();

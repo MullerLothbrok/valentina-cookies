@@ -6,6 +6,16 @@ import { originalSections, pageFor, publishPage } from '../lib/page.js';
 import { mutate, readState } from '../lib/storage.js';
 import { cookie, orderSource, requireAdmin, verifyPassword } from '../lib/session.js';
 
+function unusedPhotos(state, previous) {
+  const used = new Set([
+    ...Object.values(state.products).flatMap(p => p.photos),
+    ...pageFor(state).sections.flatMap(s => Object.values(s.photos || {}))
+  ]);
+  return [...new Set(previous)].filter(src => src.startsWith('/api/photo?id=') && !used.has(src));
+}
+function removePhotos(paths) {
+  return Promise.allSettled(paths.map(src => del('fotos/' + src.slice(14) + '.jpg')));
+}
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'private, no-store');
   try {
@@ -40,7 +50,12 @@ export default async function handler(req, res) {
         return res.json({ok: true});
       }
       if (body.action === 'page') {
-        const page = await mutate(state => publishPage(state, body));
+        const {page, removed} = await mutate(state => {
+          const old = pageFor(state).sections.flatMap(s => Object.values(s.photos || {}));
+          const page = publishPage(state, body);
+          return {page, removed:unusedPhotos(state, old)};
+        });
+        await removePhotos(removed);
         return res.json({ page });
       }
       if (body.action === 'product' || body.action === 'delete') {
@@ -48,10 +63,9 @@ export default async function handler(req, res) {
           const old = state.products[body.product?.id]?.photos || [];
           check(body.product && typeof body.product === 'object', 400, 'Revisá el producto.');
           changeProduct(state, body.product, body.action === 'delete');
-          const remaining = new Set(Object.values(state.products).flatMap(p => p.photos));
-          return old.filter(p => p.startsWith('/api/photo?id=') && !remaining.has(p));
+          return unusedPhotos(state, old);
         });
-        await Promise.allSettled(removed.map(p => del('fotos/' + p.slice(14) + '.jpg')));
+        await removePhotos(removed);
       } else if (body.action === 'status') {
         await mutate(state => changeStatus(state, body.id, body.status));
       } else if (body.action === 'upload') {

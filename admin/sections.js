@@ -1,17 +1,28 @@
+import { sectionPhotos } from '../section-photos.js';
+import { preparePhoto, photoDataURL } from './photo-file.js';
 import { previewSections } from './preview.js';
 import { node, request } from '../shop-client.js';
 
 const $ = id => document.getElementById(id);
 let saved, originals = [], sections = [], dirty = false, busy = false, conflict = false;
+// Keep selected images on this device until the page is published.
+const pendingPhotos = new Map();
+function releasePhotos() {
+  const used = new Set(sections.flatMap(s => Object.values(s.photos || {})));
+  for (const url of pendingPhotos.keys()) {
+    if (!used.has(url)) { URL.revokeObjectURL(url); pendingPhotos.delete(url); }
+  }
+}
 function status(message) {
   $('pageStatus').textContent = message;
   $('publishPage').disabled = !dirty || busy || conflict;
   $('discardPage').disabled = !dirty || busy;
   $('pageControls').disabled = busy;
 }
-function changed() {
+function changed(sectionId, photoKey) {
   dirty = true;
-  previewSections(sections, document.activeElement?.closest('.page-card')?.dataset.id);
+  releasePhotos();
+  previewSections(sections, sectionId || document.activeElement?.closest('.page-card')?.dataset.id, photoKey);
   status(conflict ? 'La página cambió en otra sesión. Descartá esta edición para cargar la actual.' : 'Hay cambios sin publicar.');
 }
 function button(label, fn, disabled = false) {
@@ -23,7 +34,66 @@ function field(label, element) {
   const wrapper = node('label', label);
   wrapper.append(element); return wrapper;
 }
+function photoFields(s) {
+  const group = node('div', null, 'section-photos');
+  group.append(node('h3', 'Fotos de la sección'));
+  for (const [key, slot] of Object.entries(sectionPhotos[s.id])) {
+    const row = node('div', null, 'section-photo');
+    const thumb = node('img'); thumb.alt = ''; thumb.loading = 'lazy';
+    const controls = node('div');
+    const picker = node('label', 'Cambiar foto', 'pick-photo');
+    const file = node('input'); file.type = 'file'; file.accept = 'image/*';
+    file.dataset.photoKey = key; file.setAttribute('aria-label', 'Cambiar foto de ' + slot.label);
+    const error = node('small'); error.setAttribute('role', 'alert');
+    const restore = button('Restaurar original', () => {
+      delete s.photos[key]; update(); changed(s.id, key);
+    });
+    function update() {
+      thumb.src = s.photos?.[key] || slot.original;
+      restore.hidden = !s.photos?.[key]; error.textContent = '';
+    }
+    file.onchange = async () => {
+      const selected = file.files[0]; if (!selected || busy) return;
+      busy = true; status('Preparando foto…'); error.textContent = '';
+      try {
+        const blob = await preparePhoto(selected);
+        if (!sections.includes(s)) return;
+        const url = URL.createObjectURL(blob);
+        pendingPhotos.set(url, {blob});
+        (s.photos ??= {})[key] = url;
+        update(); changed(s.id, key);
+      } catch {
+        error.textContent = 'No pudimos abrir la foto. Probá con una imagen JPG, PNG o WebP.';
+        status(dirty ? 'Hay cambios sin publicar.' : '');
+      } finally {
+        busy = false; file.value = ''; status($('pageStatus').textContent);
+      }
+    };
+    picker.append(file); controls.append(node('strong', slot.label), picker, restore, error);
+    row.append(thumb, controls); group.append(row); update();
+  }
+  return group;
+}
+async function photosForPublication() {
+  const result = structuredClone(sections);
+  for (const s of result) {
+    if (!sectionPhotos[s.id]) continue;
+    s.photos ??= {};
+    for (const [key, url] of Object.entries(s.photos)) {
+      const draft = pendingPhotos.get(url);
+      if (!draft) continue;
+      if (!draft.uploaded) {
+        status('Subiendo foto de ' + sectionPhotos[s.id][key].label + '…');
+        const data = await photoDataURL(draft.blob);
+        draft.uploaded = (await request({action:'upload', image:data.split(',')[1]})).photo;
+      }
+      s.photos[key] = draft.uploaded;
+    }
+  }
+  return result;
+}
 function draw(openId) {
+  releasePhotos();
   const list = $('sectionList');
   list.replaceChildren();
   for (const [index, s] of sections.entries()) {
@@ -52,7 +122,10 @@ function draw(openId) {
         sections.splice(index, 1); changed(); draw(); $('addSection').focus();
       }));
     card.dataset.id = s.id;
-    card.append(summary, field('Título', title), field('Texto', body), toggle, controls);
+    card.append(summary, field('Título', title), field('Texto', body));
+    if (sectionPhotos[s.id]) card.append(photoFields(s));
+    if (s.id === 'catalogo') card.append(node('p', 'Para cambiar una foto del catálogo, entrá en Productos y tocá Fotos o Agregar foto.', 'muted'));
+    card.append(toggle, controls);
     list.append(card);
   }
   const select = $('restoreSection');
@@ -103,7 +176,7 @@ $('publishPage').onclick = async () => {
   if (missing) { draw(missing.id); focusCard(missing.id, 'input'); status('Escribí un título para esta sección.'); return; }
   busy = true; status('Publicando…');
   try {
-    const {page} = await request({action:'page', version:saved.version, sections});
+    const {page} = await request({action:'page', version:saved.version, sections:await photosForPublication()});
     saved = page; sections = structuredClone(page.sections); dirty = false; conflict = false;
     draw(); status('Cambios publicados en la tienda.');
   } catch (e) { conflict = e.status === 409; status(conflict ? e.message + ' Usá Descartar cambios para recargar.' : e.message); }

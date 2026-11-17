@@ -1,3 +1,4 @@
+import { sectionPhotos } from './section-photos.js';
 import { node } from './shop-client.js';
 
 const main = document.querySelector('#contenido');
@@ -5,7 +6,11 @@ const originals = new Map();
 for (const section of main.querySelectorAll(':scope > section')) {
   const title = section.querySelector('[data-page-title]');
   const body = section.querySelector('[data-page-body]');
-  originals.set(section.id, {section, title: title.cloneNode(true), body: body.cloneNode(true)});
+  const photos = Array.from(section.querySelectorAll('[data-section-photo]'), img => ({
+    img, src:img.getAttribute('src'), srcset:img.getAttribute('srcset'), alt:img.alt,
+    full:img.closest('[data-full]')?.dataset.full
+  }));
+  originals.set(section.id, {photos, section, title: title.cloneNode(true), body: body.cloneNode(true)});
 }
 function setCopy(field, value, original) {
   if (original && value === original.textContent) {
@@ -33,6 +38,22 @@ export function displaySections(sections) {
     }
     setCopy(section.querySelector('[data-page-title]'), s.title, original?.title);
     setCopy(section.querySelector('[data-page-body]'), s.body, original?.body);
+    for (const photo of original?.photos || []) {
+      const {img} = photo;
+      const key = img.dataset.sectionPhoto;
+      const replacement = s.photos?.[key];
+      const src = replacement || photo.src;
+      if (img.getAttribute('src') === src) continue;
+      if (replacement || !photo.srcset) img.removeAttribute('srcset');
+      else img.setAttribute('srcset', photo.srcset);
+      img.src = src;
+      img.alt = replacement ? sectionPhotos[s.id][key].label : photo.alt;
+      if (photo.full) {
+        const button = img.closest('[data-full]');
+        button.dataset.full = replacement || photo.full;
+        button.setAttribute('aria-label', 'Ampliar: ' + img.alt);
+      }
+    }
     main.append(section);
   }
   document.querySelector('.logo').setAttribute('href', visible.has('inicio') ? '#inicio' : '#contenido');

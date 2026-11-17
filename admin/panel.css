@@ -92,3 +92,9 @@ button,select,.page-card summary,#productPreviewPanel summary{min-height:44px}
   .heading{flex-wrap:wrap}
 }
 @media(max-width:380px){.preview-toolbar select{max-width:130px}.row-actions{gap:.3rem}.row-actions button{padding-inline:.4rem}}
+.section-photos{margin:1rem 0}
+.section-photo{display:flex;align-items:center;gap:.8rem;padding:.6rem 0;border-bottom:1px solid #ded8cd}
+.section-photo img{width:72px;height:78px;object-fit:cover;border-radius:8px}
+.section-photo strong,.section-photo small{display:block}
+.section-photo .pick-photo,.section-photo button{font-size:.9rem}
+.section-photo small[role=alert]{color:#941e35}

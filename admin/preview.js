@@ -1,21 +1,21 @@
 let catalog, page, selected = 'inicio';
-let product = null;
+let product = null, selectedPhoto;
 const frame = () => document.getElementById('pagePreview');
 const productFrame = () => document.getElementById('productPreview');
 function send(target, payload) {
   target?.contentWindow?.postMessage({type:'valentina-preview', ...payload}, location.origin);
 }
-function refresh() {
+function refresh(recenter = false) {
   if (!catalog || !page) return;
-  send(frame(), {...catalog, sections:page, focus:selected});
+  send(frame(), {...catalog, sections:page, focus:selected, photoKey:selectedPhoto, recenter:recenter === true});
 }
 export function previewCatalog(data) {
   catalog = {products:data.products, categories:data.categories};
   refresh();
 }
-export function previewSections(sections, focus) {
+export function previewSections(sections, focus, photoKey) {
   page = sections;
-  if (focus) selected = focus;
+  if (focus) { selected = focus; selectedPhoto = photoKey; }
   refresh();
 }
 export function previewProduct(draft) {
@@ -33,18 +33,24 @@ window.addEventListener('message', event => {
       const card = [...document.querySelectorAll('.page-card')].find(el => el.dataset.id === event.data.id);
       if (card) {
         card.open = true;
-        card.querySelector('input').focus({preventScroll:true});
-        card.scrollIntoView({block:'nearest', behavior:'smooth'});
+        const picker = [...card.querySelectorAll('[data-photo-key]')].find(el => el.dataset.photoKey === event.data.photoKey);
+        const field = picker || card.querySelector('input');
+        document.getElementById('previewPane').classList.remove('mobile-open');
+        field.focus({preventScroll:true});
+        field.scrollIntoView({block:'center', behavior:'smooth'});
+        selectedPhoto = picker?.dataset.photoKey;
         selected = event.data.id;
         refresh();
-        document.getElementById('previewPane').classList.remove('mobile-open');
       }
     }
   }
   if (event.source === productFrame()?.contentWindow && event.data?.type === 'valentina-preview-ready') previewProduct(product);
 });
 const pane = document.getElementById('previewPane');
-document.getElementById('showPreview').onclick = () => pane.classList.add('mobile-open');
+document.getElementById('showPreview').onclick = () => {
+  pane.classList.add('mobile-open');
+  sizeFrame(); requestAnimationFrame(() => refresh(true));
+};
 document.getElementById('closePreview').onclick = () => pane.classList.remove('mobile-open');
 document.getElementById('previewSize').onchange = event => {
   pane.classList.toggle('preview-phone', event.target.value === 'phone');
