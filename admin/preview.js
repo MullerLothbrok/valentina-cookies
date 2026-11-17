@@ -1,5 +1,5 @@
 let catalog, page, selected = 'inicio';
-let product = null, selectedPhoto, catalogRevision = 0;
+let product = null, selectedPhoto, catalogRevision = 0, catalogSnapshot;
 const frame = () => document.getElementById('pagePreview');
 const productFrame = () => document.getElementById('productPreview');
 function send(target, payload) {
@@ -10,8 +10,12 @@ function refresh(recenter = false) {
   send(frame(), {...catalog, catalogRevision, sections:page, focus:selected, photoKey:selectedPhoto, recenter:recenter === true});
 }
 export function previewCatalog(data) {
+  const next = {products:data.products, categories:data.categories};
+  const snapshot = JSON.stringify(next);
+  if (snapshot === catalogSnapshot) return;
+  catalogSnapshot = snapshot;
   catalogRevision++;
-  catalog = {products:data.products, categories:data.categories};
+  catalog = next;
   refresh();
 }
 export function previewSections(sections, focus, photoKey) {
