@@ -1,7 +1,7 @@
 import { preparePhoto, photoDataURL } from './photo-file.js';
 import { previewCatalog, previewProduct } from './preview.js';
 import { request, node } from '../shop-client.js';
-import { loadPageEditor, resetPageEditor } from './sections.js';
+import { loadPageEditor, resetPageEditor, pageEditing } from './sections.js';
 import { loadCategories, selectCategory, setCategoryProducts } from './categories.js';
 import { money } from '../order.js';
 
@@ -26,7 +26,8 @@ async function reload() {
     $('logout').hidden = false; previewCatalog(data);
     setCategoryProducts(data.products); loadCategories(data.categories, reload, note, placement => { tab('products'); $('productFilter').value = placement.categoryId; $('productSearch').value = ''; renderProducts(); openEditor(undefined, false, placement); }); renderProducts(); renderOrders(); loadPageEditor(data.page, data.originalSections);
   } catch (error) {
-    if (error.status === 401) showLogin();
+    if (error.status === 401 && !pageEditing().dirty && !productDirty) showLogin();
+    else if (error.status === 401) error.message = 'Tu sesión venció. Abrí el panel en otra pestaña, ingresá con tu clave y volvé aquí para guardar. Tus cambios siguen en esta pestaña.';
     throw error;
   }
 }
@@ -90,6 +91,7 @@ function renderOrders() {
 }
 function openEditor(id, duplicate = false, placement = {}) {
   productDirty = false;
+  $('reloadProduct').hidden = true;
   $('photoStatus').textContent = '';
   const p = id ? data.products[id] : { name:'', description:'', price:0, stock:null, available:true, photos:[], version:null, ...placement };
   draft = { ...structuredClone(p), id:duplicate ? crypto.randomUUID() : id || crypto.randomUUID() };
@@ -145,6 +147,7 @@ $('files').onchange = async () => {
 function setProductBusy(busy, label = 'Guardar producto') {
   productBusy = busy; $('productFields').disabled = busy;
   $('save').disabled = busy; $('close').disabled = busy;
+  $('reloadProduct').disabled = busy;
   $('save').textContent = label; syncPhotoCount();
 }
 async function save(remove) {
@@ -169,11 +172,20 @@ async function save(remove) {
     productDirty = false; $('editor').close(); await reload(); note(remove ? 'Producto eliminado.' : 'Producto guardado.');
   } catch (e) {
     $('editError').textContent = e.message;
+    if (e.status === 401) $('editError').textContent = 'Tu sesión venció. Ingresá al panel en otra pestaña y volvé aquí para guardar. Tus cambios siguen acá.';
     if (!$('editor').open) note(e.message);
-    if (e.status === 409) await reload().catch(err => note(err.message));
+    if (e.status === 409) { $('reloadProduct').hidden = false; await reload().catch(err => note(err.message)); }
   } finally { setProductBusy(false); }
 }
 $('edit').onsubmit = e => { e.preventDefault(); save(false); };
+$('reloadProduct').onclick = async () => {
+  if (!confirm('¿Descartar esta edición y abrir la última versión del producto?')) return;
+  try {
+    await reload();
+    if (data.products[draft.id]) openEditor(draft.id);
+    else { productDirty = false; $('editor').close(); note('Este producto fue eliminado en otra sesión.'); }
+  } catch (e) { $('editError').textContent = e.message; }
+};
 $('delete').onclick = () => { if (confirm('¿Eliminar ' + draft.name + ' del catálogo?')) save(true); };
 $('add').onclick = () => openEditor(undefined, false, {categoryId:data.categories[$('productFilter').value] ? $('productFilter').value : ''});
 function closeProduct() {
@@ -191,7 +203,11 @@ $('login').onsubmit = async e => {
   try { await request({action:'login',password:$('login').elements.password.value}); $('login').reset(); await reload(); note(''); }
   catch (err) { note(err.message); }
 };
-$('logout').onclick = async () => { try { await request({action:'logout'}); showLogin(); note(''); } catch(e) { note(e.message); } };
+$('logout').onclick = async () => {
+  if (pageEditing().busy || productBusy) { note('Esperá a que termine de guardar antes de salir.'); return; }
+  if ((pageEditing().dirty || productDirty) && !confirm('Hay cambios sin guardar o publicar. ¿Salir y descartarlos?')) return;
+  try { await request({action:'logout'}); showLogin(); note(''); } catch(e) { note(e.message); }
+};
 $('productFilter').onchange = renderProducts;
 $('productSearch').oninput = renderProducts;
 $('filter').onchange = renderOrders; $('refresh').onclick = () => reload().then(() => note('Lista actualizada.')).catch(e => note(e.message));

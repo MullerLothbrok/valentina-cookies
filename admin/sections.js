@@ -6,6 +6,7 @@ import { node, request } from '../shop-client.js';
 
 const $ = id => document.getElementById(id);
 let saved, originals = [], sections = [], dirty = false, busy = false, conflict = false;
+export const pageEditing = () => ({dirty, busy});
 // Keep selected images on this device until the page is published.
 const pendingPhotos = new Map();
 function releasePhotos() {

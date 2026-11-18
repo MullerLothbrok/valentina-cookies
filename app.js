@@ -185,7 +185,7 @@ form.addEventListener('change', readBuilder);
 form.addEventListener('submit', event => { event.preventDefault(); readBuilder(); if (form.reportValidity()) openDialog('drawer'); });
 $('editBuilder').addEventListener('click', editBuilder);
 $('clearBuilder').addEventListener('click', () => { order.builder = emptyOrder().builder; restoreForm(); render(); modal.querySelector('[data-close-dialog]').focus(); });
-$('clearOrder').addEventListener('click', () => { rememberCheckout(null); order = emptyOrder(); restoreForm(); $('orderError').hidden = true; render(); });
+$('clearOrder').addEventListener('click', () => { rememberCheckout(null); order = emptyOrder(); restoreForm(); $('customerName').value = ''; $('deliveryCity').value = ''; $('privacyConsent').checked = false; $('orderError').hidden = true; render(); });
 $('sendOrder').addEventListener('click', async () => {
   const error = builderError(order.builder);
   if (error) {
@@ -197,9 +197,9 @@ $('sendOrder').addEventListener('click', async () => {
   if (!Object.keys(order.cart).length && !order.builder.active) {
     location.assign('https://wa.me/595994793372'); return;
   }
-  if (!$('customerName').reportValidity() || !$('deliveryCity').reportValidity()) return;
+  if (!$('customerName').reportValidity() || !$('deliveryCity').reportValidity() || !$('privacyConsent').reportValidity()) return;
   const prices = Object.fromEntries(Object.keys(order.cart).map(id => [id, catalog[id].price]));
-  const payload = { order, prices, customer: $('customerName').value.trim(), city: $('deliveryCity').value.trim() };
+  const payload = { order, prices, customer: $('customerName').value.trim(), city: $('deliveryCity').value.trim(), privacyAccepted: $('privacyConsent').checked };
   const fingerprint = JSON.stringify(payload);
   if (checkout?.fingerprint !== fingerprint) rememberCheckout({ fingerprint, key: crypto.randomUUID() });
   button.disabled = true; $('orderError').hidden = true;

@@ -15,7 +15,7 @@ test('shared prices update all presentations and reject stale product and cart e
     changeProduct(state, {...state.products[id], id, categoryId, groupId, price:15000});
   }
   const order = emptyOrder(); order.cart = {galleta:1};
-  const input = {key:randomUUID(), customer:'Ana', city:'Encarnación', prices:{galleta:15000}, order};
+  const input = {key:randomUUID(), privacyAccepted:true, customer:'Ana', city:'Encarnación', prices:{galleta:15000}, order};
   createOrder(state, input, 'test');
   const old = {...state.products.galleta, id:'galleta'};
   changePriceGroup(state, {categoryId, id:groupId, version:1, name:'Rellenas', price:18000});

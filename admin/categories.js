@@ -45,6 +45,9 @@ function closeForm() {
 }
 $('closeCategory').onclick = closeForm;
 $('categoryEditor').oncancel = event => { event.preventDefault(); closeForm(); };
+window.addEventListener('beforeunload', event => {
+  if ($('categoryEditor').open && (busy || categoryDirty())) { event.preventDefault(); event.returnValue = ''; }
+});
 $('categoryForm').onsubmit = event => { event.preventDefault(); persist(false); };
 $('categoryDelete').onclick = () => {
   const question = editing.isPrice ? '¿Quitar este precio compartido? Cada producto conservará su precio actual.' : '¿Eliminar esta categoría? Sus productos conservarán su precio y aparecerán en «Sin categoría».';

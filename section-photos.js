@@ -22,9 +22,9 @@ export const sectionPhotos = {
     principal: { label: 'Pedidos personalizados', original: '/assets/photos/postres-con-diseno-480.webp' }
   },
   marca: {
-    principal: { label: 'Foto de la marca', original: '/DSC_6232.jpg' }
+    principal: { label: 'Foto de la marca', original: '/assets/photos/DSC_6232-480.webp' }
   },
   contacto: {
-    principal: { label: 'Foto de contacto', original: '/DSC_6251.jpg' }
+    principal: { label: 'Foto de contacto', original: '/assets/photos/DSC_6251-480.webp' }
   }
 };

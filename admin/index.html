@@ -11,7 +11,7 @@
 <p>Abrí una categoría para agregar una presentación o cambiar el precio de varias a la vez.</p>
 <div id="categoryList" class="list"></div></section>
 <section id="orders" hidden><div class="heading"><h2>Pedidos nacionales</h2><button class="secondary" id="refresh">Actualizar</button></div>
-<label class="filter">Estado<select id="filter"><option value="">Todos</option><option value="pendiente">Pendientes</option><option value="confirmado">Confirmados</option><option value="enviado">Enviados</option><option value="cancelado">Cancelados</option></select></label><div id="orderList" class="list"></div></section>
+<p>Una solicitud pendiente todavía necesita coordinación por WhatsApp. Confirmá el pedido después de acordarlo con la clienta: en ese momento se descuentan las unidades. Si cancelás un pedido confirmado, se reponen.</p><label class="filter">Estado<select id="filter"><option value="">Todos</option><option value="pendiente">Pendientes</option><option value="confirmado">Confirmados</option><option value="enviado">Enviados</option><option value="cancelado">Cancelados</option></select></label><div id="orderList" class="list"></div></section>
 <section id="content" hidden>
 <div class="heading"><h2>Contenido de la página</h2></div>
 <p>Ordená las secciones y editá sus títulos y textos. Los cambios aparecen en la tienda al publicarlos.</p>
@@ -47,5 +47,5 @@
 <label class="check"><input type="checkbox" name="available">Disponible para pedidos</label>
 <details id="productPreviewPanel"><summary>Ver cómo queda en el catálogo</summary><iframe id="productPreview" title="Vista previa del producto" src="/?preview=editor" sandbox="allow-scripts allow-same-origin"></iframe></details>
 <button id="delete" type="button" class="danger remove-item">Eliminar producto</button>
-</fieldset></div><div class="editor-footer"><p id="editError" role="alert"></p><button id="save">Guardar producto</button></div>
+</fieldset></div><div class="editor-footer"><p id="editError" role="alert"></p><button type="button" id="reloadProduct" class="secondary" hidden>Cargar última versión</button><button id="save">Guardar producto</button></div>
 </form></dialog><script type="module" src="/admin/panel.js"></script></body></html>

@@ -7,7 +7,7 @@ import { emptyOrder } from '../order.js';
 
 function checkout(qty, key = randomUUID()) {
   const order = emptyOrder(); order.cart.galleta = qty;
-  return { key, customer:'Ana', city:'Asunción', prices:{galleta:9000}, order };
+  return { key, privacyAccepted:true, customer:'Ana', city:'Asunción', prices:{galleta:9000}, order };
 }
 test('product edits use the current version, accept photos and retain the order snapshot after removal', () => {
   const state = initialState(); const input = checkout(2);

@@ -305,3 +305,13 @@ footer{padding-right:170px}
 .section-ink .shot-label{color:var(--section-text);background:var(--letter-backing)}
 .section-ink :is(.brand-tag,.hero-proof span){background:transparent;border-color:currentColor}
 .section-ink .corporate-strip div{border-color:currentColor}
+
+.business-details{flex-basis:100%;display:grid;gap:.45rem;text-transform:none;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.business-details a,.shipping-fields a{text-decoration:underline;text-underline-offset:3px}
+.shipping-fields .privacy-check{display:flex;align-items:flex-start;gap:.6rem;font-size:14px;line-height:1.5}
+.shipping-fields .privacy-check input{width:22px;height:22px;flex:none;margin:0;accent-color:#100e0b}
+.business-info{max-width:850px;margin:auto;padding:3rem max(20px,4vw);line-height:1.7}
+.business-info h1{font-size:clamp(2rem,6vw,3.5rem);line-height:1.1;margin-bottom:2rem}
+.business-info h2{font-size:1.5rem;margin:2rem 0 .8rem}
+.business-info p{margin:.8rem 0}.business-info a:not(.btn){text-decoration:underline}
+.information-page header{justify-content:space-between;gap:1rem}.information-page header>a:last-child{font-weight:700}
